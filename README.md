@@ -10,8 +10,9 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 
 <!-- begin auto-generated rules list -->
 
-| Name                                         | Description                               |
-| :------------------------------------------- | :---------------------------------------- |
-| [import-strict](docs/rules/import-strict.md) | Enforce the usage of 'node:assert/strict' |
+| Name                                                 | Description                               |
+| :--------------------------------------------------- | :---------------------------------------- |
+| [import-strict](docs/rules/import-strict.md)         | Enforce the usage of 'node:assert/strict' |
+| [no-assert-rejects](docs/rules/no-assert-rejects.md) | Disallow the usage of 'assert.rejects'    |
 
 <!-- end auto-generated rules list -->
