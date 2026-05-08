@@ -10,8 +10,11 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 
 <!-- begin auto-generated rules list -->
 
-| Name                                         | Description                               |
-| :------------------------------------------- | :---------------------------------------- |
-| [import-strict](docs/rules/import-strict.md) | Enforce the usage of 'node:assert/strict' |
+🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
+
+| Name                                                   | Description                                                                       | 🔧 |
+| :----------------------------------------------------- | :-------------------------------------------------------------------------------- | :- |
+| [import-strict](docs/rules/import-strict.md)           | Enforce the usage of 'node:assert/strict'                                         |    |
+| [no-constant-actual](docs/rules/no-constant-actual.md) | Disallow passing a constant value as the first argument to Node.js assert methods | 🔧 |
 
 <!-- end auto-generated rules list -->
