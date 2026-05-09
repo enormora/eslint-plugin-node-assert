@@ -14,7 +14,8 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 
 | Name                                                   | Description                                                                       | 🔧 |
 | :----------------------------------------------------- | :-------------------------------------------------------------------------------- | :- |
-| [import-strict](docs/rules/import-strict.md)           | Enforce the usage of 'node:assert/strict'                                         |    |
+| [consistent-import](docs/rules/consistent-import.md)   | Enforce a consistent Node.js assert import style                                  |    |
 | [no-constant-actual](docs/rules/no-constant-actual.md) | Disallow passing a constant value as the first argument to Node.js assert methods | 🔧 |
+| [require-strict](docs/rules/require-strict.md)         | Require strict assertion semantics for Node.js assert equality methods            | 🔧 |
 
 <!-- end auto-generated rules list -->

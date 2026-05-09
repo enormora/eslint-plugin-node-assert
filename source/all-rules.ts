@@ -1,10 +1,11 @@
-import type { TSESLint } from "@typescript-eslint/utils";
-import { importStrictRule } from "./rules/import-strict.js";
+import { consistentImportRule } from "./rules/consistent-import.js";
 import { noConstantActualRule } from "./rules/no-constant-actual.js";
+import { requireStrictRule } from "./rules/require-strict.js";
 
-const allRules: Record<string, TSESLint.RuleModule<string, unknown[]>> = {
-	"import-strict": importStrictRule,
-	"no-constant-actual": noConstantActualRule
+const allRules = {
+	"consistent-import": consistentImportRule,
+	"no-constant-actual": noConstantActualRule,
+	"require-strict": requireStrictRule
 };
 
 export default {
