@@ -1,4 +1,6 @@
-# Disallow passing an expected value where a message or error matcher belongs in Node.js assert calls (`node-assert/no-expected-value-as-message`)
+# node-assert/no-expected-value-as-message
+
+📝 Disallow passing an expected value where a message or error matcher belongs in Node.js assert calls.
 
 <!-- end auto-generated rule header -->
 

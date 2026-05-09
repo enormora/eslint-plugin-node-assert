@@ -1,4 +1,6 @@
-# Disallow passing a constant value as the first argument to Node.js assert methods (`node-assert/no-constant-actual`)
+# node-assert/no-constant-actual
+
+📝 Disallow passing a constant value as the first argument to Node.js assert methods.
 
 🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
 
