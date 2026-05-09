@@ -6,5 +6,5 @@
 		"rootDir": "."
 	},
 	"references": [{ "path": "../source/" }],
-	"include": ["./**/*.test.ts"]
+	"include": ["./**/*.test.ts", "./helpers/**/*.ts"]
 }
