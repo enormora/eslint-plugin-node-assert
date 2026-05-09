@@ -11,6 +11,8 @@ ruleTester.run("require-strict", requireStrictRule, {
 		"import { strictEqual } from 'node:assert'; strictEqual(actual, expected);",
 		"import { equal } from 'somewhere'; equal(actual, expected);",
 		"import assert from 'node:assert'; const alias = assert; alias.strictEqual(actual, expected);",
+		"import assert from 'node:assert'; const { strict } = assert; strict.equal(actual, expected);",
+		"import assert from 'node:assert'; const { strict: s } = assert; s.equal(actual, expected);",
 		{
 			code: "import assert from 'node:assert/strict'; assert.equal(actual, expected);",
 			options: [{ mode: "semantic" }]
@@ -44,6 +46,18 @@ ruleTester.run("require-strict", requireStrictRule, {
 			options: [{ mode: "explicit" }],
 			errors: [{ messageId: "require-strict" }],
 			output: "import assert from 'node:assert/strict'; assert.strictEqual(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert'; const { strict } = assert; strict.equal(actual, expected);",
+			options: [{ mode: "explicit" }],
+			errors: [{ messageId: "require-strict" }],
+			output: "import assert from 'node:assert'; const { strict } = assert; strict.strictEqual(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert'; const { strict: s } = assert; s.equal(actual, expected);",
+			options: [{ mode: "explicit" }],
+			errors: [{ messageId: "require-strict" }],
+			output: "import assert from 'node:assert'; const { strict: s } = assert; s.strictEqual(actual, expected);"
 		}
 	]
 });

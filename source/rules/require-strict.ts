@@ -83,6 +83,40 @@ function getDestructuredAssertionMethodBinding(
 	};
 }
 
+function getStrictReExportLocalName(
+	property: Readonly<TSESTree.ObjectLiteralElement | TSESTree.RestElement>
+): string | undefined {
+	if (property.type !== AST_NODE_TYPES.Property || property.computed) {
+		return undefined;
+	}
+	if (property.key.type !== AST_NODE_TYPES.Identifier || property.key.name !== "strict") {
+		return undefined;
+	}
+	if (property.value.type !== AST_NODE_TYPES.Identifier) {
+		return undefined;
+	}
+	return property.value.name;
+}
+
+function applyDestructuredProperty(
+	state: BindingState,
+	property: Readonly<TSESTree.ObjectLiteralElement | TSESTree.RestElement>,
+	strictNamespaceBinding: boolean
+): void {
+	const strictReExportLocalName = getStrictReExportLocalName(property);
+	if (strictReExportLocalName !== undefined) {
+		state.namespaceStrictnessByName.set(strictReExportLocalName, true);
+		return;
+	}
+	const destructuredMethodBinding = getDestructuredAssertionMethodBinding(property, strictNamespaceBinding);
+	if (destructuredMethodBinding !== undefined) {
+		state.methodBindingByName.set(
+			destructuredMethodBinding.localName,
+			destructuredMethodBinding.assertionMethodCall
+		);
+	}
+}
+
 function copyNamespaceBinding(
 	state: BindingState,
 	targetNode: Readonly<TSESTree.Node>,
@@ -96,13 +130,7 @@ function copyNamespaceBinding(
 		return;
 	}
 	for (const property of targetNode.properties) {
-		const destructuredMethodBinding = getDestructuredAssertionMethodBinding(property, strictNamespaceBinding);
-		if (destructuredMethodBinding !== undefined) {
-			state.methodBindingByName.set(
-				destructuredMethodBinding.localName,
-				destructuredMethodBinding.assertionMethodCall
-			);
-		}
+		applyDestructuredProperty(state, property, strictNamespaceBinding);
 	}
 }
 
