@@ -1,4 +1,6 @@
-# Enforce a consistent Node.js assert import style (`node-assert/consistent-import`)
+# node-assert/consistent-import
+
+📝 Enforce a consistent Node.js assert import style.
 
 <!-- end auto-generated rule header -->
 

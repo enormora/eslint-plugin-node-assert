@@ -1,4 +1,6 @@
-# Require strict assertion semantics for Node.js assert equality methods (`node-assert/require-strict`)
+# node-assert/require-strict
+
+📝 Require strict assertion semantics for Node.js assert equality methods.
 
 🔧 This rule is automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/latest/user-guide/command-line-interface#--fix).
 

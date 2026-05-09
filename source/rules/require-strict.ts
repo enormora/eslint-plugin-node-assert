@@ -60,6 +60,52 @@ function getMethodImportName(specifier: Readonly<TSESTree.ImportSpecifier>): str
 	return undefined;
 }
 
+function getDestructuredAssertionMethodBinding(
+	property: Readonly<TSESTree.ObjectLiteralElement | TSESTree.RestElement>,
+	strictNamespaceBinding: boolean
+): { readonly localName: string; readonly assertionMethodCall: AssertionMethodCall } | undefined {
+	if (property.type !== AST_NODE_TYPES.Property || property.computed) {
+		return undefined;
+	}
+	if (property.key.type !== AST_NODE_TYPES.Identifier || property.value.type !== AST_NODE_TYPES.Identifier) {
+		return undefined;
+	}
+	const { name: methodName } = property.key;
+	if (!LEGACY_TO_STRICT_METHOD_NAME.has(methodName) && !STRICT_METHOD_NAMES.has(methodName)) {
+		return undefined;
+	}
+	return {
+		localName: property.value.name,
+		assertionMethodCall: {
+			methodName,
+			fromStrictBinding: strictNamespaceBinding || STRICT_METHOD_NAMES.has(methodName)
+		}
+	};
+}
+
+function copyNamespaceBinding(
+	state: BindingState,
+	targetNode: Readonly<TSESTree.Node>,
+	strictNamespaceBinding: boolean
+): void {
+	if (targetNode.type === AST_NODE_TYPES.Identifier) {
+		state.namespaceStrictnessByName.set(targetNode.name, strictNamespaceBinding);
+		return;
+	}
+	if (targetNode.type !== AST_NODE_TYPES.ObjectPattern) {
+		return;
+	}
+	for (const property of targetNode.properties) {
+		const destructuredMethodBinding = getDestructuredAssertionMethodBinding(property, strictNamespaceBinding);
+		if (destructuredMethodBinding !== undefined) {
+			state.methodBindingByName.set(
+				destructuredMethodBinding.localName,
+				destructuredMethodBinding.assertionMethodCall
+			);
+		}
+	}
+}
+
 function processImportDeclaration(state: BindingState, node: Readonly<TSESTree.ImportDeclaration>): void {
 	const moduleSpecifier = node.source.value;
 	if (!isStrictModuleSpecifier(moduleSpecifier) && !isBaseModuleSpecifier(moduleSpecifier)) {
@@ -92,16 +138,16 @@ function processVariableDeclaration(state: BindingState, node: Readonly<TSESTree
 		return;
 	}
 	for (const declarator of node.declarations) {
-		if (declarator.id.type === AST_NODE_TYPES.Identifier && declarator.init?.type === AST_NODE_TYPES.Identifier) {
+		if (declarator.init?.type === AST_NODE_TYPES.Identifier) {
 			const sourceIdentifierName = declarator.init.name;
 			const strictNamespaceBinding = state.namespaceStrictnessByName.get(sourceIdentifierName);
-			if (strictNamespaceBinding === undefined) {
+			if (strictNamespaceBinding !== undefined) {
+				copyNamespaceBinding(state, declarator.id, strictNamespaceBinding);
+			} else if (declarator.id.type === AST_NODE_TYPES.Identifier) {
 				const methodBinding = state.methodBindingByName.get(sourceIdentifierName);
 				if (methodBinding !== undefined) {
 					state.methodBindingByName.set(declarator.id.name, methodBinding);
 				}
-			} else {
-				state.namespaceStrictnessByName.set(declarator.id.name, strictNamespaceBinding);
 			}
 		}
 	}
@@ -197,7 +243,7 @@ export const requireStrictRule = createRule<RequireStrictOptions, "require-stric
 					fix(fixer) {
 						if (node.callee.type === AST_NODE_TYPES.MemberExpression) {
 							const { property } = node.callee;
-							if (property.type === AST_NODE_TYPES.Identifier) {
+							if (property.type === AST_NODE_TYPES.Identifier && !node.callee.computed) {
 								return fixer.replaceText(property, strictMethodName);
 							}
 							if (property.type === AST_NODE_TYPES.Literal && typeof property.value === "string") {

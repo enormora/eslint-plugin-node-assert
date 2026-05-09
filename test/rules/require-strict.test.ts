@@ -32,6 +32,14 @@ ruleTester.run("require-strict", requireStrictRule, {
 			output: "import assert from 'node:assert'; const alias = assert; alias['deepStrictEqual'](actual, expected);"
 		},
 		{
+			code: "import assert from 'node:assert'; const { equal: strictEqual } = assert; strictEqual(actual, expected);",
+			errors: [{ messageId: "require-strict" }]
+		},
+		{
+			code: "import assert from 'node:assert'; const key = 'equal'; assert[key](actual, expected);",
+			errors: [{ messageId: "require-strict" }]
+		},
+		{
 			code: "import assert from 'node:assert/strict'; assert.equal(actual, expected);",
 			options: [{ mode: "explicit" }],
 			errors: [{ messageId: "require-strict" }],
