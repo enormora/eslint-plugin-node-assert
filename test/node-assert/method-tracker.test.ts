@@ -2,7 +2,8 @@ import * as assert from "node:assert/strict";
 import { suite, test } from "mocha";
 import type { Rule } from "eslint";
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
-import { createAssertBindingTracker } from "../../source/node-assert/method-tracker.js";
+import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../../source/node-assert/method-tracker.js";
+import { isAssertModuleSpecifier } from "../../source/node-assert/modules.js";
 import { expectNoLintFailure, runProbeRule } from "../helpers/linter-runner.js";
 
 const ASSERT_METHODS: ReadonlySet<string> = new Set(["strictEqual", "deepStrictEqual", "ifError"]);
@@ -11,16 +12,46 @@ function isAssertMethod(name: string): boolean {
 	return ASSERT_METHODS.has(name);
 }
 
-type ResolvedCall = {
+// eslint-disable-next-line sonarjs/function-return-type -- the sentinel signals "not an assert module" and is intentionally distinct from the boolean strictness meta
+function classifyStrictness(specifier: unknown): boolean | typeof NOT_ASSERT_MODULE {
+	if (specifier === "node:assert" || specifier === "assert") {
+		return false;
+	}
+	if (specifier === "node:assert/strict" || specifier === "assert/strict") {
+		return true;
+	}
+	return NOT_ASSERT_MODULE;
+}
+
+type ResolvedCall<TMeta> = {
 	readonly calleeText: string;
 	readonly resolvedMethod: string | undefined;
+	readonly meta: TMeta | undefined;
 };
 
-function resolveCallsIn(code: string): readonly ResolvedCall[] {
-	const calls: ResolvedCall[] = [];
+type ProbeOptions<TMeta> = {
+	readonly classifyModule?: (specifier: unknown) => TMeta | typeof NOT_ASSERT_MODULE;
+	readonly resolveNamespaceProperty?: (propertyName: string, sourceMeta: TMeta) => TMeta | undefined;
+};
+
+function resolveCallsIn<TMeta = null>(
+	code: string,
+	probeOptions: ProbeOptions<TMeta> = {}
+): readonly ResolvedCall<TMeta>[] {
+	const classifyModule =
+		probeOptions.classifyModule ??
+		((specifier: unknown): TMeta | typeof NOT_ASSERT_MODULE => {
+			return isAssertModuleSpecifier(specifier) ? (null as TMeta) : NOT_ASSERT_MODULE;
+		});
+	const calls: ResolvedCall<TMeta>[] = [];
 	const probeRule: Rule.RuleModule = {
 		create(context) {
-			const tracker = createAssertBindingTracker({ isAssertMethod });
+			const baseOptions = { isAssertMethod, classifyModule } as const;
+			const tracker = createAssertBindingTracker<TMeta>(
+				probeOptions.resolveNamespaceProperty === undefined
+					? baseOptions
+					: { ...baseOptions, resolveNamespaceProperty: probeOptions.resolveNamespaceProperty }
+			);
 			return {
 				ImportDeclaration(node) {
 					tracker.processImport(node as unknown as TSESTree.ImportDeclaration);
@@ -34,7 +65,8 @@ function resolveCallsIn(code: string): readonly ResolvedCall[] {
 					const resolved = tracker.resolveMethodCall(calleeNode as unknown as TSESTree.Expression, scope);
 					calls.push({
 						calleeText: context.sourceCode.getText(calleeNode),
-						resolvedMethod: resolved
+						resolvedMethod: resolved?.methodName,
+						meta: resolved?.meta
 					});
 				}
 			};
@@ -170,6 +202,78 @@ suite("createAssertBindingTracker()", function () {
 			);
 			assert.strictEqual(calls[0]?.resolvedMethod, undefined);
 			assert.strictEqual(calls.at(-1)?.resolvedMethod, "strictEqual");
+		});
+	});
+
+	suite("namespace metadata", function () {
+		test("propagates module-level metadata through default imports", function () {
+			const baseCalls = resolveCallsIn<boolean>("import assert from 'node:assert'; assert.strictEqual(1, 2);", {
+				classifyModule: classifyStrictness
+			});
+			assert.strictEqual(baseCalls[0]?.meta, false);
+
+			const strictCalls = resolveCallsIn<boolean>(
+				"import assert from 'node:assert/strict'; assert.strictEqual(1, 2);",
+				{ classifyModule: classifyStrictness }
+			);
+			assert.strictEqual(strictCalls[0]?.meta, true);
+		});
+
+		test("propagates metadata through alias chains and destructuring", function () {
+			const calls = resolveCallsIn<boolean>(
+				"import assert from 'node:assert/strict'; const a = assert; const b = a; const { strictEqual } = b; strictEqual(1, 2); b.deepStrictEqual({}, {});",
+				{ classifyModule: classifyStrictness }
+			);
+			assert.strictEqual(calls[0]?.meta, true);
+			assert.strictEqual(calls[1]?.meta, true);
+		});
+
+		test("attaches the source module metadata to method bindings from named imports", function () {
+			const calls = resolveCallsIn<boolean>("import { strictEqual } from 'node:assert'; strictEqual(1, 2);", {
+				classifyModule: classifyStrictness
+			});
+			assert.strictEqual(calls[0]?.meta, false);
+		});
+	});
+
+	suite("resolveNamespaceProperty hook", function () {
+		function resolveStrictReExport(propertyName: string): boolean | undefined {
+			return propertyName === "strict" ? true : undefined;
+		}
+
+		test("registers a re-exported namespace through a named import", function () {
+			const calls = resolveCallsIn<boolean>("import { strict } from 'node:assert'; strict.strictEqual(1, 2);", {
+				classifyModule: classifyStrictness,
+				resolveNamespaceProperty: resolveStrictReExport
+			});
+			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+			assert.strictEqual(calls[0].meta, true);
+		});
+
+		test("registers a re-exported namespace through const destructuring", function () {
+			const calls = resolveCallsIn<boolean>(
+				"import assert from 'node:assert'; const { strict } = assert; strict.strictEqual(1, 2);",
+				{ classifyModule: classifyStrictness, resolveNamespaceProperty: resolveStrictReExport }
+			);
+			assert.strictEqual(calls.at(-1)?.resolvedMethod, "strictEqual");
+			assert.strictEqual(calls.at(-1)?.meta, true);
+		});
+
+		test("registers a renamed re-exported namespace through const destructuring", function () {
+			const calls = resolveCallsIn<boolean>(
+				"import assert from 'node:assert'; const { strict: s } = assert; s.strictEqual(1, 2);",
+				{ classifyModule: classifyStrictness, resolveNamespaceProperty: resolveStrictReExport }
+			);
+			assert.strictEqual(calls.at(-1)?.resolvedMethod, "strictEqual");
+			assert.strictEqual(calls.at(-1)?.meta, true);
+		});
+
+		test("does not register a re-export when the hook returns undefined", function () {
+			const calls = resolveCallsIn<boolean>(
+				"import assert from 'node:assert'; const { something } = assert; something.strictEqual(1, 2);",
+				{ classifyModule: classifyStrictness, resolveNamespaceProperty: resolveStrictReExport }
+			);
+			assert.strictEqual(calls.at(-1)?.resolvedMethod, undefined);
 		});
 	});
 });

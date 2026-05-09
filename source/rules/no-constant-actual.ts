@@ -1,6 +1,7 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from "@typescript-eslint/utils";
 import { isConstant } from "../ast/is-constant.js";
-import { createAssertBindingTracker } from "../node-assert/method-tracker.js";
+import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.js";
+import { isAssertModuleSpecifier } from "../node-assert/modules.js";
 
 const createRule = ESLintUtils.RuleCreator((name) => {
 	return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
@@ -99,7 +100,12 @@ export const noConstantActualRule = createRule({
 	defaultOptions: [],
 
 	create(context) {
-		const tracker = createAssertBindingTracker({ isAssertMethod: isAssertMethodName });
+		const tracker = createAssertBindingTracker<null>({
+			isAssertMethod: isAssertMethodName,
+			classifyModule(specifier) {
+				return isAssertModuleSpecifier(specifier) ? null : NOT_ASSERT_MODULE;
+			}
+		});
 		const { sourceCode } = context;
 
 		function reportSwap(
@@ -143,11 +149,11 @@ export const noConstantActualRule = createRule({
 			ImportDeclaration: tracker.processImport,
 			VariableDeclaration: tracker.processVariableDeclaration,
 			CallExpression(node) {
-				const methodName = tracker.resolveMethodCall(node.callee, sourceCode.getScope(node));
-				if (methodName === undefined) {
+				const resolved = tracker.resolveMethodCall(node.callee, sourceCode.getScope(node));
+				if (resolved === undefined) {
 					return;
 				}
-				if (ONE_ARG_METHODS.has(methodName)) {
+				if (ONE_ARG_METHODS.has(resolved.methodName)) {
 					handleOneArgCall(node);
 					return;
 				}
