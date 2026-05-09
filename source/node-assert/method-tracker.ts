@@ -7,6 +7,7 @@ export type AssertBindingTrackerOptions<TMeta> = {
 	readonly isAssertMethod: (methodName: string) => boolean;
 	readonly classifyModule: (moduleSpecifier: unknown) => NotAssertModule | TMeta;
 	readonly resolveNamespaceProperty?: (propertyName: string, sourceMeta: TMeta) => TMeta | undefined;
+	readonly namespaceCallableMethod?: string;
 };
 
 export type ResolvedMethodCall<TMeta> = {
@@ -151,6 +152,25 @@ function resolveMemberMethod<TMeta>(
 	return { methodName: propertyName, meta: namespace.meta };
 }
 
+function resolveIdentifierCallee<TMeta>(
+	state: TrackerState<TMeta>,
+	name: string
+): ResolvedMethodCall<TMeta> | undefined {
+	const methodBinding = state.methodBindings.get(name);
+	if (methodBinding !== undefined) {
+		return methodBinding;
+	}
+	const callableMethodName = state.options.namespaceCallableMethod;
+	if (callableMethodName === undefined) {
+		return undefined;
+	}
+	const namespace = state.namespaces.get(name);
+	if (namespace === undefined) {
+		return undefined;
+	}
+	return { methodName: callableMethodName, meta: namespace.meta };
+}
+
 export function createAssertBindingTracker<TMeta>(
 	options: AssertBindingTrackerOptions<TMeta>
 ): AssertBindingTracker<TMeta> {
@@ -188,7 +208,7 @@ export function createAssertBindingTracker<TMeta>(
 			return resolveMemberMethod(state, callee, scope);
 		}
 		if (callee.type === AST_NODE_TYPES.Identifier) {
-			return state.methodBindings.get(callee.name);
+			return resolveIdentifierCallee(state, callee.name);
 		}
 		return undefined;
 	}

@@ -32,6 +32,7 @@ type ResolvedCall<TMeta> = {
 type ProbeOptions<TMeta> = {
 	readonly classifyModule?: (specifier: unknown) => TMeta | typeof NOT_ASSERT_MODULE;
 	readonly resolveNamespaceProperty?: (propertyName: string, sourceMeta: TMeta) => TMeta | undefined;
+	readonly namespaceCallableMethod?: string;
 };
 
 function resolveCallsIn<TMeta = null>(
@@ -46,12 +47,16 @@ function resolveCallsIn<TMeta = null>(
 	const calls: ResolvedCall<TMeta>[] = [];
 	const probeRule: Rule.RuleModule = {
 		create(context) {
-			const baseOptions = { isAssertMethod, classifyModule } as const;
-			const tracker = createAssertBindingTracker<TMeta>(
-				probeOptions.resolveNamespaceProperty === undefined
-					? baseOptions
-					: { ...baseOptions, resolveNamespaceProperty: probeOptions.resolveNamespaceProperty }
-			);
+			const tracker = createAssertBindingTracker<TMeta>({
+				isAssertMethod,
+				classifyModule,
+				...(probeOptions.resolveNamespaceProperty === undefined
+					? {}
+					: { resolveNamespaceProperty: probeOptions.resolveNamespaceProperty }),
+				...(probeOptions.namespaceCallableMethod === undefined
+					? {}
+					: { namespaceCallableMethod: probeOptions.namespaceCallableMethod })
+			});
 			return {
 				ImportDeclaration(node) {
 					tracker.processImport(node as unknown as TSESTree.ImportDeclaration);
@@ -272,6 +277,83 @@ suite("createAssertBindingTracker()", function () {
 			const calls = resolveCallsIn<boolean>(
 				"import assert from 'node:assert'; const { something } = assert; something.strictEqual(1, 2);",
 				{ classifyModule: classifyStrictness, resolveNamespaceProperty: resolveStrictReExport }
+			);
+			assert.strictEqual(calls.at(-1)?.resolvedMethod, undefined);
+		});
+	});
+
+	suite("namespaceCallableMethod option", function () {
+		test("treats a direct namespace call as the configured method", function () {
+			const calls = resolveCallsIn("import assert from 'node:assert/strict'; assert(value, message);", {
+				namespaceCallableMethod: "strictEqual"
+			});
+			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+		});
+
+		test("treats a direct namespace-import call as the configured method", function () {
+			const calls = resolveCallsIn("import * as assert from 'node:assert/strict'; assert(value, message);", {
+				namespaceCallableMethod: "strictEqual"
+			});
+			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+		});
+
+		test("propagates namespace metadata through the namespace-callable form", function () {
+			const baseCalls = resolveCallsIn<boolean>("import assert from 'node:assert'; assert(value, message);", {
+				classifyModule: classifyStrictness,
+				namespaceCallableMethod: "strictEqual"
+			});
+			assert.strictEqual(baseCalls[0]?.meta, false);
+
+			const strictCalls = resolveCallsIn<boolean>(
+				"import assert from 'node:assert/strict'; assert(value, message);",
+				{ classifyModule: classifyStrictness, namespaceCallableMethod: "strictEqual" }
+			);
+			assert.strictEqual(strictCalls[0]?.meta, true);
+		});
+
+		test("resolves namespace-callable form through const aliases", function () {
+			const calls = resolveCallsIn(
+				"import assert from 'node:assert/strict'; const a = assert; const b = a; b(value, message);",
+				{ namespaceCallableMethod: "strictEqual" }
+			);
+			assert.strictEqual(calls.at(-1)?.resolvedMethod, "strictEqual");
+		});
+
+		test("resolves namespace-callable form through a re-exported strict namespace", function () {
+			function resolveStrictReExport(propertyName: string): boolean | undefined {
+				return propertyName === "strict" ? true : undefined;
+			}
+			const calls = resolveCallsIn<boolean>("import { strict } from 'node:assert'; strict(value, message);", {
+				classifyModule: classifyStrictness,
+				resolveNamespaceProperty: resolveStrictReExport,
+				namespaceCallableMethod: "strictEqual"
+			});
+			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+			assert.strictEqual(calls[0].meta, true);
+		});
+
+		test("prefers a destructured method binding over the callable namespace shortcut", function () {
+			const calls = resolveCallsIn(
+				"import assert from 'node:assert/strict'; const { strictEqual: foo } = assert; foo(1, 2);",
+				{ namespaceCallableMethod: "deepStrictEqual" }
+			);
+			assert.strictEqual(calls.at(-1)?.resolvedMethod, "strictEqual");
+		});
+
+		test("does not resolve namespace-callable form for untracked identifiers", function () {
+			const calls = resolveCallsIn("foo(value, message);", { namespaceCallableMethod: "strictEqual" });
+			assert.strictEqual(calls[0]?.resolvedMethod, undefined);
+		});
+
+		test("ignores namespace-callable form when the option is not set", function () {
+			const calls = resolveCallsIn("import assert from 'node:assert/strict'; assert(value, message);");
+			assert.strictEqual(calls[0]?.resolvedMethod, undefined);
+		});
+
+		test("ignores namespace-callable form for let-declared aliases", function () {
+			const calls = resolveCallsIn(
+				"import assert from 'node:assert/strict'; let a = assert; a(value, message);",
+				{ namespaceCallableMethod: "strictEqual" }
 			);
 			assert.strictEqual(calls.at(-1)?.resolvedMethod, undefined);
 		});
