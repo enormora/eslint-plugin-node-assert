@@ -1,4 +1,6 @@
-# Enforce the usage of 'node:assert/strict' (`node-assert/import-strict`)
+# node-assert/import-strict
+
+📝 Enforce the usage of 'node:assert/strict'.
 
 <!-- end auto-generated rule header -->
 
