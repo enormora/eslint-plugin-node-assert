@@ -12,10 +12,11 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 
 🔧 Automatically fixable by the [`--fix` CLI option](https://eslint.org/docs/user-guide/command-line-interface#--fix).
 
-| Name                                                   | Description                                                                       | 🔧 |
-| :----------------------------------------------------- | :-------------------------------------------------------------------------------- | :- |
-| [consistent-import](docs/rules/consistent-import.md)   | Enforce a consistent Node.js assert import style                                  |    |
-| [no-constant-actual](docs/rules/no-constant-actual.md) | Disallow passing a constant value as the first argument to Node.js assert methods | 🔧 |
-| [require-strict](docs/rules/require-strict.md)         | Require strict assertion semantics for Node.js assert equality methods            | 🔧 |
+| Name                                                                       | Description                                                                                         | 🔧 |
+| :------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------- | :- |
+| [consistent-import](docs/rules/consistent-import.md)                       | Enforce a consistent Node.js assert import style                                                    |    |
+| [no-constant-actual](docs/rules/no-constant-actual.md)                     | Disallow passing a constant value as the first argument to Node.js assert methods                   | 🔧 |
+| [no-expected-value-as-message](docs/rules/no-expected-value-as-message.md) | Disallow passing an expected value where a message or error matcher belongs in Node.js assert calls |    |
+| [require-strict](docs/rules/require-strict.md)                             | Require strict assertion semantics for Node.js assert equality methods                              | 🔧 |
 
 <!-- end auto-generated rules list -->
