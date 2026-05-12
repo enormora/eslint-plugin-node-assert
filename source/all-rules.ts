@@ -4,6 +4,7 @@ import { noExpectedValueAsMessageRule } from "./rules/no-expected-value-as-messa
 import { preferDeepEqualityRule } from "./rules/prefer-deep-equality.js";
 import { preferMatchRule } from "./rules/prefer-match.js";
 import { preferPartialDeepStrictEqualRule } from "./rules/prefer-partial-deep-strict-equal.js";
+import { requireCustomMessageRule } from "./rules/require-custom-message.js";
 import { requireStrictRule } from "./rules/require-strict.js";
 
 const allRules = {
@@ -13,6 +14,7 @@ const allRules = {
 	"prefer-deep-equality": preferDeepEqualityRule,
 	"prefer-match": preferMatchRule,
 	"prefer-partial-deep-strict-equal": preferPartialDeepStrictEqualRule,
+	"require-custom-message": requireCustomMessageRule,
 	"require-strict": requireStrictRule
 };
 

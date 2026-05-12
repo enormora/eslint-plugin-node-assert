@@ -20,6 +20,7 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 | [prefer-deep-equality](docs/rules/prefer-deep-equality.md)                         | Prefer deep equality assertions when comparing object or array literals                                                 | 🔧 |
 | [prefer-match](docs/rules/prefer-match.md)                                         | Prefer assert.match() or assert.doesNotMatch() for regular expression assertions                                        | 🔧 |
 | [prefer-partial-deep-strict-equal](docs/rules/prefer-partial-deep-strict-equal.md) | Prefer a single `partialDeepStrictEqual` over multiple consecutive equality assertions on properties of the same object |    |
+| [require-custom-message](docs/rules/require-custom-message.md)                     | Require a custom failure message argument in Node.js assert calls                                                       |    |
 | [require-strict](docs/rules/require-strict.md)                                     | Require strict assertion semantics for Node.js assert equality methods                                                  | 🔧 |
 
 <!-- end auto-generated rules list -->
