@@ -1,6 +1,7 @@
 import { consistentImportRule } from "./rules/consistent-import.js";
 import { noConstantActualRule } from "./rules/no-constant-actual.js";
 import { noExpectedValueAsMessageRule } from "./rules/no-expected-value-as-message.js";
+import { noRestrictedAssertionRule } from "./rules/no-restricted-assertion.js";
 import { preferDeepEqualityRule } from "./rules/prefer-deep-equality.js";
 import { preferMatchRule } from "./rules/prefer-match.js";
 import { preferPartialDeepStrictEqualRule } from "./rules/prefer-partial-deep-strict-equal.js";
@@ -11,6 +12,7 @@ const allRules = {
 	"consistent-import": consistentImportRule,
 	"no-constant-actual": noConstantActualRule,
 	"no-expected-value-as-message": noExpectedValueAsMessageRule,
+	"no-restricted-assertion": noRestrictedAssertionRule,
 	"prefer-deep-equality": preferDeepEqualityRule,
 	"prefer-match": preferMatchRule,
 	"prefer-partial-deep-strict-equal": preferPartialDeepStrictEqualRule,
