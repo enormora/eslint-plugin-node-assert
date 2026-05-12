@@ -34,7 +34,7 @@
 		"@enormora/eslint-config-node": "0.0.26",
 		"@enormora/eslint-config-typescript": "0.0.36",
 		"@types/mocha": "10.0.10",
-		"@types/node": "24.12.3",
+		"@types/node": "24.12.4",
 		"@typescript-eslint/rule-tester": "8.59.3",
 		"eslint": "10.3.0",
 		"eslint-doc-generator": "3.3.2",
