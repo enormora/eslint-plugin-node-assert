@@ -25,6 +25,7 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 | [prefer-match](docs/rules/prefer-match.md)                                                 | Prefer assert.match() or assert.doesNotMatch() for regular expression assertions                                        | 🔧 |
 | [prefer-partial-deep-strict-equal](docs/rules/prefer-partial-deep-strict-equal.md)         | Prefer a single `partialDeepStrictEqual` over multiple consecutive equality assertions on properties of the same object |    |
 | [require-custom-message](docs/rules/require-custom-message.md)                             | Require a custom failure message argument in Node.js assert calls                                                       |    |
+| [require-error-matcher](docs/rules/require-error-matcher.md)                               | Require assert.throws() and assert.rejects() to include an error matcher                                                |    |
 | [require-strict](docs/rules/require-strict.md)                                             | Require strict assertion semantics for Node.js assert equality methods                                                  | 🔧 |
 | [require-valid-error-validator-return](docs/rules/require-valid-error-validator-return.md) | Require custom Node.js assert error validators to return true when their checks pass                                    |    |
 
