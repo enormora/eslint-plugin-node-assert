@@ -1,5 +1,6 @@
 /* eslint-disable import/max-dependencies -- central rule barrel intentionally aggregates every rule */
 import { consistentImportRule } from "./rules/consistent-import.js";
+import { noAsyncFunctionInSyncAssertionRule } from "./rules/no-async-function-in-sync-assertion.js";
 import { noConstantActualRule } from "./rules/no-constant-actual.js";
 import { noExpectedValueAsMessageRule } from "./rules/no-expected-value-as-message.js";
 import { noRestrictedAssertionRule } from "./rules/no-restricted-assertion.js";
@@ -14,6 +15,7 @@ import { requireStrictRule } from "./rules/require-strict.js";
 
 const allRules = {
 	"consistent-import": consistentImportRule,
+	"no-async-function-in-sync-assertion": noAsyncFunctionInSyncAssertionRule,
 	"no-constant-actual": noConstantActualRule,
 	"no-expected-value-as-message": noExpectedValueAsMessageRule,
 	"no-restricted-assertion": noRestrictedAssertionRule,
