@@ -31,6 +31,15 @@ ruleTester.run("require-error-matcher", requireErrorMatcherRule, {
 		{
 			code: "import assert from 'node:assert/strict'; await assert.rejects(promise, importedMatcher);",
 			options: [{ allowedMatchers: ["object"] }]
+		},
+		{
+			code: "import * as assert from 'node:assert/strict'; assert.throws(fn, TypeError);"
+		},
+		{
+			code: "import { strict as strictAssert } from 'node:assert'; await strictAssert.rejects(promise, /invalid input/);"
+		},
+		{
+			code: "import assert from 'node:assert/strict'; const strictAssert = assert; strictAssert.throws(fn, TypeError);"
 		}
 	],
 	invalid: [
@@ -104,6 +113,18 @@ ruleTester.run("require-error-matcher", requireErrorMatcherRule, {
 		{
 			code: "import assert from 'node:assert'; const { strict } = assert; strict.rejects(promise);",
 			errors: [{ messageId: "missing-error-matcher", data: { methodName: "rejects" } }]
+		},
+		{
+			code: "import * as assert from 'node:assert/strict'; assert.throws(fn);",
+			errors: [{ messageId: "missing-error-matcher", data: { methodName: "throws" } }]
+		},
+		{
+			code: "import { strict as strictAssert } from 'node:assert'; strictAssert.rejects(promise);",
+			errors: [{ messageId: "missing-error-matcher", data: { methodName: "rejects" } }]
+		},
+		{
+			code: "import assert from 'node:assert/strict'; const strictAssert = assert; strictAssert.throws(fn);",
+			errors: [{ messageId: "missing-error-matcher", data: { methodName: "throws" } }]
 		}
 	]
 });
