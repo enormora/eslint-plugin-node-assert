@@ -9,11 +9,17 @@ const createRule = ESLintUtils.RuleCreator((name) => {
 	return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
 });
 
-const BOOLEAN_ASSERTION_METHOD_NAMES: ReadonlySet<string> = new Set(["ok", "equal", "strictEqual"]);
-const STRICT_MODULE_SPECIFIERS: ReadonlySet<string> = new Set(["node:assert/strict", "assert/strict"]);
-const BASE_MODULE_SPECIFIERS: ReadonlySet<string> = new Set(["node:assert", "assert"]);
-const ONE_ASSERTION_ARGUMENT = 1;
-const TWO_ASSERTION_ARGUMENTS = 2;
+const booleanAssertionMethodNames: ReadonlySet<string> = new Set([
+	"ok",
+	"equal",
+	"strictEqual",
+	"notEqual",
+	"notStrictEqual"
+]);
+const strictModuleSpecifiers: ReadonlySet<string> = new Set(["node:assert/strict", "assert/strict"]);
+const baseModuleSpecifiers: ReadonlySet<string> = new Set(["node:assert", "assert"]);
+const oneAssertionArgument = 1;
+const twoAssertionArguments = 2;
 
 type ReplacementMethodName = "equal" | "notEqual" | "notStrictEqual" | "strictEqual";
 type SupportedBinaryOperator = "!=" | "!==" | "==" | "===";
@@ -21,19 +27,19 @@ type SupportedComparisonExpression = Readonly<TSESTree.BinaryExpression> & {
 	readonly operator: SupportedBinaryOperator;
 };
 type ComparisonPlan = {
-	readonly consumedArgumentCount: typeof ONE_ASSERTION_ARGUMENT | typeof TWO_ASSERTION_ARGUMENTS;
+	readonly consumedArgumentCount: typeof oneAssertionArgument | typeof twoAssertionArguments;
 	readonly leftExpression: TSESTree.Expression;
 	readonly replacementMethodName: ReplacementMethodName;
 	readonly rightExpression: TSESTree.Expression;
 };
 
-const AFFIRMATIVE_REPLACEMENT_METHOD_NAMES = new Map<SupportedBinaryOperator, ReplacementMethodName>([
+const affirmativeReplacementMethodNames = new Map<SupportedBinaryOperator, ReplacementMethodName>([
 	["!=", "notEqual"],
 	["!==", "notStrictEqual"],
 	["==", "equal"],
 	["===", "strictEqual"]
 ]);
-const NEGATED_REPLACEMENT_METHOD_NAMES = new Map<SupportedBinaryOperator, ReplacementMethodName>([
+const negatedReplacementMethodNames = new Map<SupportedBinaryOperator, ReplacementMethodName>([
 	["!=", "equal"],
 	["!==", "strictEqual"],
 	["==", "notEqual"],
@@ -41,7 +47,7 @@ const NEGATED_REPLACEMENT_METHOD_NAMES = new Map<SupportedBinaryOperator, Replac
 ]);
 
 function isAssertMethodName(methodName: string): boolean {
-	return BOOLEAN_ASSERTION_METHOD_NAMES.has(methodName);
+	return booleanAssertionMethodNames.has(methodName);
 }
 
 // eslint-disable-next-line sonarjs/function-return-type -- the sentinel signals "not an assert module" and is intentionally distinct from the boolean strictness meta
@@ -49,10 +55,10 @@ function classifyModule(moduleSpecifier: unknown): boolean | typeof NOT_ASSERT_M
 	if (typeof moduleSpecifier !== "string") {
 		return NOT_ASSERT_MODULE;
 	}
-	if (STRICT_MODULE_SPECIFIERS.has(moduleSpecifier)) {
+	if (strictModuleSpecifiers.has(moduleSpecifier)) {
 		return true;
 	}
-	if (BASE_MODULE_SPECIFIERS.has(moduleSpecifier)) {
+	if (baseModuleSpecifiers.has(moduleSpecifier)) {
 		return false;
 	}
 	return NOT_ASSERT_MODULE;
@@ -117,22 +123,22 @@ function usesLooseEqualityOperator(operator: SupportedBinaryOperator): boolean {
 function getReplacementMethodName(
 	operator: SupportedBinaryOperator,
 	isStrictModule: boolean,
-	expectedBooleanValue: boolean
+	expectedComparisonValue: boolean
 ): ReplacementMethodName | undefined {
 	if (isStrictModule && usesLooseEqualityOperator(operator)) {
 		return undefined;
 	}
-	const replacementMethodNames = expectedBooleanValue
-		? AFFIRMATIVE_REPLACEMENT_METHOD_NAMES
-		: NEGATED_REPLACEMENT_METHOD_NAMES;
+	const replacementMethodNames = expectedComparisonValue
+		? affirmativeReplacementMethodNames
+		: negatedReplacementMethodNames;
 	return replacementMethodNames.get(operator);
 }
 
 function buildComparisonPlan(
 	comparisonExpression: Readonly<SupportedComparisonExpression>,
-	consumedArgumentCount: typeof ONE_ASSERTION_ARGUMENT | typeof TWO_ASSERTION_ARGUMENTS,
+	consumedArgumentCount: typeof oneAssertionArgument | typeof twoAssertionArguments,
 	isStrictModule: boolean,
-	expectedBooleanValue: boolean
+	expectedComparisonValue: boolean
 ): ComparisonPlan | undefined {
 	if (!isComparisonOperand(comparisonExpression.left) || !isComparisonOperand(comparisonExpression.right)) {
 		return undefined;
@@ -140,7 +146,7 @@ function buildComparisonPlan(
 	const replacementMethodName = getReplacementMethodName(
 		comparisonExpression.operator,
 		isStrictModule,
-		expectedBooleanValue
+		expectedComparisonValue
 	);
 	if (replacementMethodName === undefined) {
 		return undefined;
@@ -161,10 +167,18 @@ function getOkComparisonPlan(
 	if (testedExpression === undefined || !isSupportedComparisonExpression(testedExpression)) {
 		return undefined;
 	}
-	return buildComparisonPlan(testedExpression, ONE_ASSERTION_ARGUMENT, isStrictModule, true);
+	return buildComparisonPlan(testedExpression, oneAssertionArgument, isStrictModule, true);
+}
+
+function getExpectedComparisonValue(methodName: string, expectedBooleanValue: boolean): boolean {
+	if (methodName === "notEqual" || methodName === "notStrictEqual") {
+		return !expectedBooleanValue;
+	}
+	return expectedBooleanValue;
 }
 
 function getBooleanAssertionComparisonPlan(
+	methodName: string,
 	assertionNode: Readonly<TSESTree.CallExpression>,
 	isStrictModule: boolean
 ): ComparisonPlan | undefined {
@@ -177,7 +191,12 @@ function getBooleanAssertionComparisonPlan(
 	if (expectedBooleanValue === undefined || !isSupportedComparisonExpression(firstArgument)) {
 		return undefined;
 	}
-	return buildComparisonPlan(firstArgument, TWO_ASSERTION_ARGUMENTS, isStrictModule, expectedBooleanValue);
+	return buildComparisonPlan(
+		firstArgument,
+		twoAssertionArguments,
+		isStrictModule,
+		getExpectedComparisonValue(methodName, expectedBooleanValue)
+	);
 }
 
 function getComparisonPlan(
@@ -188,7 +207,7 @@ function getComparisonPlan(
 	if (methodName === "ok") {
 		return getOkComparisonPlan(assertionNode, isStrictModule);
 	}
-	return getBooleanAssertionComparisonPlan(assertionNode, isStrictModule);
+	return getBooleanAssertionComparisonPlan(methodName, assertionNode, isStrictModule);
 }
 
 function getExpressionText(

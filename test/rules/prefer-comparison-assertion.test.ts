@@ -16,6 +16,8 @@ ruleTester.run("prefer-comparison-assertion", preferComparisonAssertionRule, {
 		"import assert from 'node:assert/strict'; assert(predicate(value));",
 		"import assert from 'node:assert/strict'; assert.equal(predicate(value), true);",
 		"import assert from 'node:assert/strict'; assert.strictEqual(predicate(value), false);",
+		"import assert from 'node:assert/strict'; assert.notEqual(predicate(value), false);",
+		"import assert from 'node:assert/strict'; assert.notStrictEqual(predicate(value), true);",
 		"import assert from 'node:assert/strict'; assert.ok(actual < expected);",
 		"import assert from 'node:assert/strict'; assert.equal(actual >= expected, true);",
 
@@ -24,6 +26,8 @@ ruleTester.run("prefer-comparison-assertion", preferComparisonAssertionRule, {
 		"import assert from 'node:assert/strict'; assert(actual != expected);",
 		"import assert from 'node:assert/strict'; assert.equal(actual == expected, true);",
 		"import assert from 'node:assert/strict'; assert.strictEqual(actual != expected, false);",
+		"import assert from 'node:assert/strict'; assert.notEqual(actual == expected, false);",
+		"import assert from 'node:assert/strict'; assert.notStrictEqual(actual != expected, true);",
 		"import { strict } from 'node:assert'; strict.ok(actual == expected);",
 		"import assert from 'node:assert'; const { strict: s } = assert; s.equal(actual != expected, true);",
 
@@ -59,6 +63,8 @@ ruleTester.run("prefer-comparison-assertion", preferComparisonAssertionRule, {
 		"import { ok } from 'node:assert/strict'; const a = ok; const b = a; b(predicate(value));",
 		"import assert from 'node:assert/strict'; const { equal: eq } = assert; eq(result, true);",
 		"import { strictEqual } from 'node:assert/strict'; const eq = strictEqual; eq(result, false);",
+		"import assert from 'node:assert/strict'; const { notEqual: neq } = assert; neq(result, false);",
+		"import { notStrictEqual } from 'node:assert/strict'; const neq = notStrictEqual; neq(result, true);",
 		"import assert from 'node:assert'; const { strict: s } = assert; s(predicate(value));",
 		"import assert from 'node:assert'; const key = 'strictEqual'; assert[key](result, true);"
 	],
@@ -130,6 +136,51 @@ ruleTester.run("prefer-comparison-assertion", preferComparisonAssertionRule, {
 			code: "import assert from 'node:assert'; assert.strictEqual(actual == expected, false);",
 			errors: [{ messageId: "prefer-comparison-assertion" }],
 			output: "import assert from 'node:assert'; assert.notEqual(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert/strict'; assert.notStrictEqual(actual === expected, false);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert/strict'; assert.strictEqual(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert/strict'; assert.notStrictEqual(actual === expected, true, message);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert/strict'; assert.notStrictEqual(actual, expected, message);"
+		},
+		{
+			code: "import assert from 'node:assert'; assert.notEqual(actual != expected, false);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert'; assert.notEqual(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert'; assert.notEqual(actual == expected, true);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert'; assert.notEqual(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert'; assert.notEqual(actual == expected, false);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert'; assert.equal(actual, expected);"
+		},
+		{
+			code: "import assert from 'node:assert'; assert[`notStrictEqual`](42 === result.deep.value, false, message);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert'; assert[`strictEqual`](42, result.deep.value, message);"
+		},
+		{
+			code: "import assert from 'node:assert'; const { strict: s } = assert; s.notStrictEqual(actual !== expected, false);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: "import assert from 'node:assert'; const { strict: s } = assert; s.notStrictEqual(actual, expected);"
+		},
+		{
+			code: "import { notEqual as neq } from 'node:assert'; neq(actual == expected, false);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: null
+		},
+		{
+			code: "import assert from 'node:assert/strict'; const { notStrictEqual: neq } = assert; const a = neq; a(actual === expected, false);",
+			errors: [{ messageId: "prefer-comparison-assertion" }],
+			output: null
 		},
 		{
 			code: "import { equal as eq } from 'node:assert'; eq(actual == expected, true);",

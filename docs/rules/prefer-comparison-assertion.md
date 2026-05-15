@@ -35,12 +35,14 @@ assert.strictEqual(result.deep.value, 42);
 - `assert.ok(left === right)` -> `assert.strictEqual(left, right)`
 - `assert.ok(left !== right)` -> `assert.notStrictEqual(left, right)`
 - `assert.equal(left === right, false)` -> `assert.notStrictEqual(left, right)`
+- `assert.notStrictEqual(left === right, false)` -> `assert.strictEqual(left, right)`
 - `assert.strictEqual(left !== right, false)` -> `assert.strictEqual(left, right)`
 
 Loose operators are only rewritten for legacy `node:assert` bindings:
 
 - `assert.ok(left == right)` -> `assert.equal(left, right)`
 - `assert.equal(left != right, false)` -> `assert.equal(left, right)`
+- `assert.notEqual(left == right, false)` -> `assert.equal(left, right)`
 
 The rule intentionally skips loose comparisons on `node:assert/strict` (and `{ strict }` re-exports), because replacing `==` or `!=` there would change runtime semantics.
 
