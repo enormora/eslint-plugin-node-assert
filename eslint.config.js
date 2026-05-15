@@ -39,5 +39,12 @@ export default [
 		rules: {
 			"new-cap": "off"
 		}
+	},
+	{
+		files: ["source/rules/require-error-matcher.ts", "source/rules/require-error-matcher-support.ts"],
+		rules: {
+			"@typescript-eslint/no-use-before-define": "off",
+			"functional/prefer-immutable-types": "off"
+		}
 	}
 ];

@@ -10,6 +10,7 @@ import { preferDeepEqualityRule } from "./rules/prefer-deep-equality.js";
 import { preferMatchRule } from "./rules/prefer-match.js";
 import { preferPartialDeepStrictEqualRule } from "./rules/prefer-partial-deep-strict-equal.js";
 import { requireCustomMessageRule } from "./rules/require-custom-message.js";
+import { requireErrorMatcherRule } from "./rules/require-error-matcher.js";
 import { requireValidErrorValidatorReturnRule } from "./rules/require-valid-error-validator-return.js";
 import { requireStrictRule } from "./rules/require-strict.js";
 
@@ -25,6 +26,7 @@ const allRules = {
 	"prefer-match": preferMatchRule,
 	"prefer-partial-deep-strict-equal": preferPartialDeepStrictEqualRule,
 	"require-custom-message": requireCustomMessageRule,
+	"require-error-matcher": requireErrorMatcherRule,
 	"require-valid-error-validator-return": requireValidErrorValidatorReturnRule,
 	"require-strict": requireStrictRule
 };
