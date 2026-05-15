@@ -13,6 +13,7 @@ export type AssertBindingTrackerOptions<TMeta> = {
 export type ResolvedMethodCall<TMeta> = {
 	readonly methodName: string;
 	readonly meta: TMeta;
+	readonly bindingKind: "member-expression" | "method-binding" | "namespace-callable";
 };
 
 export type AssertBindingTracker<TMeta> = {
@@ -149,7 +150,7 @@ function resolveMemberMethod<TMeta>(
 	if (propertyName === null || !state.options.isAssertMethod(propertyName)) {
 		return undefined;
 	}
-	return { methodName: propertyName, meta: namespace.meta };
+	return { methodName: propertyName, meta: namespace.meta, bindingKind: "member-expression" };
 }
 
 function resolveIdentifierCallee<TMeta>(
@@ -158,7 +159,7 @@ function resolveIdentifierCallee<TMeta>(
 ): ResolvedMethodCall<TMeta> | undefined {
 	const methodBinding = state.methodBindings.get(name);
 	if (methodBinding !== undefined) {
-		return methodBinding;
+		return { ...methodBinding, bindingKind: "method-binding" };
 	}
 	const callableMethodName = state.options.namespaceCallableMethod;
 	if (callableMethodName === undefined) {
@@ -168,7 +169,7 @@ function resolveIdentifierCallee<TMeta>(
 	if (namespace === undefined) {
 		return undefined;
 	}
-	return { methodName: callableMethodName, meta: namespace.meta };
+	return { methodName: callableMethodName, meta: namespace.meta, bindingKind: "namespace-callable" };
 }
 
 export function createAssertBindingTracker<TMeta>(
