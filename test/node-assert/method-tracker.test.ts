@@ -263,8 +263,12 @@ suite("createAssertBindingTracker()", function () {
 				classifyModule: classifyStrictness,
 				resolveNamespaceProperty: resolveStrictReExport
 			});
-			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
-			assert.strictEqual(calls[0].meta, true);
+			const [firstCall] = calls;
+			if (firstCall === undefined) {
+				throw new Error("expected the call to be resolved");
+			}
+			assert.strictEqual(firstCall.resolvedMethod, "strictEqual");
+			assert.strictEqual(firstCall.meta, true);
 		});
 
 		test("registers a re-exported namespace through const destructuring", function () {
@@ -345,8 +349,12 @@ suite("createAssertBindingTracker()", function () {
 				resolveNamespaceProperty: resolveStrictReExport,
 				namespaceCallableMethod: "strictEqual"
 			});
-			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
-			assert.strictEqual(calls[0].meta, true);
+			const [firstCall] = calls;
+			if (firstCall === undefined) {
+				throw new Error("expected the call to be resolved");
+			}
+			assert.strictEqual(firstCall.resolvedMethod, "strictEqual");
+			assert.strictEqual(firstCall.meta, true);
 		});
 
 		test("prefers a destructured method binding over the callable namespace shortcut", function () {
