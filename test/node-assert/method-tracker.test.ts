@@ -24,6 +24,7 @@ function classifyStrictness(specifier: unknown): boolean | typeof NOT_ASSERT_MOD
 }
 
 type ResolvedCall<TMeta> = {
+	readonly bindingKind: "member-expression" | "method-binding" | "namespace-callable" | undefined;
 	readonly calleeText: string;
 	readonly resolvedMethod: string | undefined;
 	readonly meta: TMeta | undefined;
@@ -69,6 +70,7 @@ function resolveCallsIn<TMeta = null>(
 					const scope = context.sourceCode.getScope(node) as unknown as TSESLint.Scope.Scope;
 					const resolved = tracker.resolveMethodCall(calleeNode as unknown as TSESTree.Expression, scope);
 					calls.push({
+						bindingKind: resolved?.bindingKind,
 						calleeText: context.sourceCode.getText(calleeNode),
 						resolvedMethod: resolved?.methodName,
 						meta: resolved?.meta
@@ -86,8 +88,13 @@ suite("createAssertBindingTracker()", function () {
 	suite("default and namespace imports", function () {
 		test("resolves member calls on a default import", function () {
 			const calls = resolveCallsIn("import assert from 'node:assert/strict'; assert.strictEqual(1, 2);");
+			const [firstCall] = calls;
+			if (firstCall === undefined) {
+				throw new Error("expected the call to be resolved");
+			}
+			assert.strictEqual(firstCall.bindingKind, "member-expression");
 			assert.strictEqual(calls.length, 1);
-			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+			assert.strictEqual(firstCall.resolvedMethod, "strictEqual");
 		});
 
 		test("resolves member calls on a namespace import", function () {
@@ -106,7 +113,12 @@ suite("createAssertBindingTracker()", function () {
 	suite("named imports", function () {
 		test("resolves direct named imports", function () {
 			const calls = resolveCallsIn("import { strictEqual } from 'node:assert/strict'; strictEqual(1, 2);");
-			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+			const [firstCall] = calls;
+			if (firstCall === undefined) {
+				throw new Error("expected the call to be resolved");
+			}
+			assert.strictEqual(firstCall.bindingKind, "method-binding");
+			assert.strictEqual(firstCall.resolvedMethod, "strictEqual");
 		});
 
 		test("resolves aliased named imports", function () {
@@ -287,7 +299,12 @@ suite("createAssertBindingTracker()", function () {
 			const calls = resolveCallsIn("import assert from 'node:assert/strict'; assert(value, message);", {
 				namespaceCallableMethod: "strictEqual"
 			});
-			assert.strictEqual(calls[0]?.resolvedMethod, "strictEqual");
+			const [firstCall] = calls;
+			if (firstCall === undefined) {
+				throw new Error("expected the call to be resolved");
+			}
+			assert.strictEqual(firstCall.bindingKind, "namespace-callable");
+			assert.strictEqual(firstCall.resolvedMethod, "strictEqual");
 		});
 
 		test("treats a direct namespace-import call as the configured method", function () {
