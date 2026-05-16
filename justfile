@@ -17,5 +17,5 @@ test-unit: compile
 update-eslint-docs: compile
 	eslint-doc-generator
 
-release: update-eslint-docs
+release: compile lint test-unit update-eslint-docs
 	release-it
