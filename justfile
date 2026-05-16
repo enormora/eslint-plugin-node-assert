@@ -14,7 +14,7 @@ lint:
 test-unit: compile
 	mocha --enable-source-maps
 
-update-eslint-docs:
+update-eslint-docs: compile
 	eslint-doc-generator
 
 release: update-eslint-docs
