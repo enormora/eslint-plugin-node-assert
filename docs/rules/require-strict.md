@@ -1,4 +1,4 @@
-# node-assert/require-strict
+# @enormora/node-assert/require-strict
 
 📝 Require strict assertion semantics for Node.js assert equality methods.
 

@@ -1,4 +1,4 @@
-# node-assert/prefer-match
+# @enormora/node-assert/prefer-match
 
 📝 Prefer assert.match() or assert.doesNotMatch() for regular expression assertions.
 
