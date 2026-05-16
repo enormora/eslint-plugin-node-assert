@@ -1,4 +1,4 @@
-# node-assert/no-async-function-in-sync-assertion
+# @enormora/node-assert/no-async-function-in-sync-assertion
 
 📝 Disallow passing async functions to synchronous Node.js assert methods.
 

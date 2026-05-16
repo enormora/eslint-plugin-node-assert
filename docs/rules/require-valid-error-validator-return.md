@@ -1,4 +1,4 @@
-# node-assert/require-valid-error-validator-return
+# @enormora/node-assert/require-valid-error-validator-return
 
 📝 Require custom Node.js assert error validators to return true when their checks pass.
 

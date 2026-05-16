@@ -1,4 +1,4 @@
-# node-assert/prefer-partial-deep-strict-equal
+# @enormora/node-assert/prefer-partial-deep-strict-equal
 
 📝 Prefer a single `partialDeepStrictEqual` over multiple consecutive equality assertions on properties of the same object.
 

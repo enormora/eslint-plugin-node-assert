@@ -1,4 +1,4 @@
-# node-assert/require-custom-message
+# @enormora/node-assert/require-custom-message
 
 📝 Require a custom failure message argument in Node.js assert calls.
 

@@ -1,4 +1,4 @@
-# node-assert/no-expected-value-as-message
+# @enormora/node-assert/no-expected-value-as-message
 
 📝 Disallow passing an expected value where a message or error matcher belongs in Node.js assert calls.
 

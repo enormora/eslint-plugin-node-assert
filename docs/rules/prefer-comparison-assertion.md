@@ -1,4 +1,4 @@
-# node-assert/prefer-comparison-assertion
+# @enormora/node-assert/prefer-comparison-assertion
 
 📝 Prefer dedicated equality assertion methods over asserting comparison results.
 

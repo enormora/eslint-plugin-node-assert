@@ -1,4 +1,4 @@
-# node-assert/prefer-deep-equality
+# @enormora/node-assert/prefer-deep-equality
 
 📝 Prefer deep equality assertions when comparing object or array literals.
 

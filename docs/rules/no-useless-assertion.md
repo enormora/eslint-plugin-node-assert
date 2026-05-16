@@ -1,4 +1,4 @@
-# node-assert/no-useless-assertion
+# @enormora/node-assert/no-useless-assertion
 
 📝 Disallow Node.js assertions whose outcome is fully determined by constant inputs.
 

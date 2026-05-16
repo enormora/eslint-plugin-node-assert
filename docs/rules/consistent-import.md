@@ -1,4 +1,4 @@
-# node-assert/consistent-import
+# @enormora/node-assert/consistent-import
 
 📝 Enforce a consistent Node.js assert import style.
 

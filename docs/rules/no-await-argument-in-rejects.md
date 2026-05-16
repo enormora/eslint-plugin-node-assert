@@ -1,4 +1,4 @@
-# node-assert/no-await-argument-in-rejects
+# @enormora/node-assert/no-await-argument-in-rejects
 
 📝 Disallow awaiting the argument passed to assert.rejects() and assert.doesNotReject().
 

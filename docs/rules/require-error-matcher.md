@@ -1,4 +1,4 @@
-# node-assert/require-error-matcher
+# @enormora/node-assert/require-error-matcher
 
 📝 Require assert.throws() and assert.rejects() to include an error matcher.
 

@@ -1,4 +1,4 @@
-# node-assert/no-restricted-assertion
+# @enormora/node-assert/no-restricted-assertion
 
 📝 Disallow configured Node.js assert methods.
 

@@ -1,4 +1,4 @@
-# node-assert/no-constant-actual
+# @enormora/node-assert/no-constant-actual
 
 📝 Disallow passing a constant value as the first argument to Node.js assert methods.
 
