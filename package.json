@@ -3,7 +3,7 @@
 	"version": "0.0.2",
 	"type": "module",
 	"description": "ESLint rules for the Node.js 'node:assert' module",
-	"author": "Christian Rackerseder <github@echooff.de>",
+	"author": "Christian Rackerseder <git@echooff.de>",
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/enormora/eslint-plugin-node-assert.git"
