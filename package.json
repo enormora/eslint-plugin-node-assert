@@ -6,7 +6,7 @@
 	"author": "Christian Rackerseder <github@echooff.de>",
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/screendriver/eslint-plugin-node-assert.git"
+		"url": "git+https://github.com/enormora/eslint-plugin-node-assert.git"
 	},
 	"license": "MIT",
 	"exports": "./target/build/source/all-rules.js",
