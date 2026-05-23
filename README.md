@@ -1,5 +1,5 @@
 [![NPM Version](https://img.shields.io/npm/v/eslint-plugin-node-assert.svg?style=flat)](https://www.npmjs.org/package/eslint-plugin-node-assert)
-[![GitHub Actions status](https://github.com/enormora/eslint-plugin-node-assert/workflows/CI/badge.svg)](https://github.com/enormora/eslint-plugin-node-assert/actions)
+[![GitHub Actions status](https://github.com/enormora/eslint-plugin-node-assert/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/enormora/eslint-plugin-node-assert/actions/workflows/main.yml)
 [![NPM Downloads](https://img.shields.io/npm/dm/eslint-plugin-node-assert.svg?style=flat)](https://www.npmjs.org/package/eslint-plugin-node-assert)
 
 # eslint-plugin-node-assert
