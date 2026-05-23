@@ -4,9 +4,18 @@ on:
     pull_request:
         types: [opened, labeled, unlabeled]
 
+permissions: {}
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
 jobs:
     check-labels:
+        name: Check Labels
         runs-on: ubuntu-latest
+        permissions:
+            pull-requests: read # required to inspect labels on the pull request event payload
         if: >
             contains(github.event.pull_request.labels.*.name, 'breaking') == false &&
             contains(github.event.pull_request.labels.*.name, 'bug') == false &&
