@@ -1,4 +1,5 @@
 /* eslint-disable import/max-dependencies -- central rule barrel intentionally aggregates every rule */
+import type { ESLint } from 'eslint';
 import { consistentImportRule } from './rules/consistent-import.ts';
 import { noAsyncFunctionInSyncAssertionRule } from './rules/no-async-function-in-sync-assertion.ts';
 import { noAwaitArgumentInRejectsRule } from './rules/no-await-argument-in-rejects.ts';
@@ -14,6 +15,8 @@ import { requireCustomMessageRule } from './rules/require-custom-message.ts';
 import { requireErrorMatcherRule } from './rules/require-error-matcher.ts';
 import { requireValidErrorValidatorReturnRule } from './rules/require-valid-error-validator-return.ts';
 import { requireStrictRule } from './rules/require-strict.ts';
+
+export type NodeAssertPlugin = ESLint.Plugin;
 
 const allRules = {
     'consistent-import': consistentImportRule,
@@ -33,6 +36,8 @@ const allRules = {
     'require-strict': requireStrictRule
 };
 
-export default {
+const plugin = {
     rules: allRules
 };
+
+export default plugin;

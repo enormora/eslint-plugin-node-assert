@@ -1,0 +1,187 @@
+---
+name: Publish Release
+
+on:
+    push:
+        branches: [main]
+    workflow_dispatch:
+        inputs:
+            release_pull_request_number:
+                required: false
+                type: string
+
+permissions: {}
+
+concurrency:
+    group: publish-release-${{ github.sha }}
+
+jobs:
+    resolve-publish-target:
+        runs-on: ubuntu-24.04
+        name: Resolve publish target
+        permissions:
+            contents: read
+            pull-requests: read # Required to inspect pull requests associated with the pushed commit.
+        outputs:
+            should_publish: ${{ steps.resolve-publish-target.outputs.should_publish }}
+            publish_commit_sha: ${{ steps.resolve-publish-target.outputs.publish_commit_sha }}
+            release_pull_request_number: ${{ steps.resolve-publish-target.outputs.release_pull_request_number }}
+        env:
+            GH_TOKEN: ${{ github.token }}
+            GITHUB_TOKEN: ${{ github.token }}
+            RELEASE_PULL_REQUEST_NUMBER: ${{ inputs.release_pull_request_number }}
+        steps:
+            - name: Resolve publish target
+              id: resolve-publish-target
+              run: |
+                  set -euo pipefail
+
+                  if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
+                    if [ -z "${RELEASE_PULL_REQUEST_NUMBER}" ]; then
+                      echo 'release_pull_request_number is required for manual publishing.'
+                      exit 1
+                    fi
+
+                    if [ "${GITHUB_REF_NAME}" != 'main' ]; then
+                      echo 'Manual publishing must run from main.'
+                      exit 1
+                    fi
+
+                    release_pull_request=$(
+                      gh api "/repos/${GITHUB_REPOSITORY}/pulls/${RELEASE_PULL_REQUEST_NUMBER}"
+                    )
+
+                    is_release_pull_request=$(
+                      jq \
+                        --arg repository "${GITHUB_REPOSITORY}" \
+                        --raw-output \
+                        '(.merged == true) and
+                         (.merged_at != null) and
+                         (.head.ref == "release/eslint-plugin-node-assert") and
+                         (.head.repo.full_name == $repository) and
+                         (.base.ref == "main") and
+                         (.title == "Prepare release")' \
+                        <<< "${release_pull_request}"
+                    )
+
+                    if [ "${is_release_pull_request}" != 'true' ]; then
+                      echo 'The requested pull request is not a merged release pull request.'
+                      exit 1
+                    fi
+
+                    publish_commit_sha=$(jq -r '.merge_commit_sha // empty' <<< "${release_pull_request}")
+                    if [ -z "${publish_commit_sha}" ]; then
+                      echo 'The requested release pull request does not have a merge commit SHA.'
+                      exit 1
+                    fi
+
+                    echo 'should_publish=true' >> "${GITHUB_OUTPUT}"
+                    echo "publish_commit_sha=${publish_commit_sha}" >> "${GITHUB_OUTPUT}"
+                    echo "release_pull_request_number=${RELEASE_PULL_REQUEST_NUMBER}" >> "${GITHUB_OUTPUT}"
+                    exit 0
+                  fi
+
+                  associated_pull_requests=$(
+                    gh api \
+                      -H "Accept: application/vnd.github+json" \
+                      "/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls"
+                  )
+
+                  matching_release_pull_requests=$(
+                    jq \
+                      --arg repository "${GITHUB_REPOSITORY}" \
+                      '[.[] |
+                        select(
+                          (.merged_at != null) and
+                          (.head.ref == "release/eslint-plugin-node-assert") and
+                          (.head.repo.full_name == $repository) and
+                          (.base.ref == "main") and
+                          (.title == "Prepare release")
+                        )
+                      ]' \
+                      <<< "${associated_pull_requests}"
+                  )
+
+                  matching_release_pull_request_count=$(jq 'length' <<< "${matching_release_pull_requests}")
+                  if [ "${matching_release_pull_request_count}" = '0' ]; then
+                    echo 'should_publish=false' >> "${GITHUB_OUTPUT}"
+                    exit 0
+                  fi
+
+                  if [ "${matching_release_pull_request_count}" != '1' ]; then
+                    echo 'More than one associated release pull request matched the pushed commit.'
+                    exit 1
+                  fi
+
+                  release_pull_request_number=$(jq -r '.[0].number' <<< "${matching_release_pull_requests}")
+                  echo 'should_publish=true' >> "${GITHUB_OUTPUT}"
+                  echo "publish_commit_sha=${GITHUB_SHA}" >> "${GITHUB_OUTPUT}"
+                  echo "release_pull_request_number=${release_pull_request_number}" >> "${GITHUB_OUTPUT}"
+
+    publish-release:
+        needs: resolve-publish-target
+        if: needs.resolve-publish-target.outputs.should_publish == 'true'
+        runs-on: ubuntu-24.04
+        name: Publish release
+        permissions:
+            contents: write # Required to push the package tag and create the GitHub Release.
+            id-token: write # Required by npm trusted publishing to mint the OIDC token.
+        env:
+            GH_TOKEN: ${{ github.token }}
+            GITHUB_TOKEN: ${{ github.token }}
+        steps:
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  ref: ${{ needs.resolve-publish-target.outputs.publish_commit_sha }}
+                  fetch-depth: 0
+                  persist-credentials: true
+            - name: Use Node.js
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              with:
+                  node-version: 26.x
+            - name: Install dependencies from the lockfile
+              run: npm clean-install --ignore-scripts
+            - name: Verify registry signatures for installed dependencies
+              run: npm audit signatures
+            - name: Verify `@packtory/cli` ships with a provenance attestation
+              run: |
+                  version=$(jq -r '.devDependencies["@packtory/cli"]' package.json)
+                  spec="@packtory/cli@${version}"
+                  attestation=$(npm view "${spec}" --json | jq -r '.dist.attestations // empty')
+                  if [ -z "${attestation}" ]; then
+                    echo "::error::${spec} is missing a provenance attestation; refusing to publish"
+                    exit 1
+                  fi
+                  echo "Verified ${spec} has a registered provenance attestation."
+            - name: Configure tag-only release push refs
+              run: git config remote.origin.push 'refs/tags/*:refs/tags/*'
+            - name: Publish release
+              id: publish-release
+              continue-on-error: true
+              run: |
+                  set -o pipefail
+                  mkdir -p target/release
+                  npx just publish-release 2>&1 | tee target/release/publish.log
+            # The `sigstore` wrapper used by `libnpmpublish` hardcodes
+            # `fetchOnConflict: false`, so a retried Rekor POST after a
+            # transient blip surfaces as
+            # `error creating tlog entry - (409) an equivalent entry already exists`
+            # even though the original submission landed. Re-running publish
+            # mints a fresh OIDC cert, so the next signature differs and
+            # Rekor accepts it.
+            - name: Re-publish release after a transient sigstore failure
+              if: steps.publish-release.outcome == 'failure'
+              run: |
+                  if grep -Eiq 'OIDC token exchange failed with status 404' target/release/publish.log; then
+                    echo 'npm Trusted Publishing is not configured correctly for this workflow.'
+                    echo 'Expected npm Trusted Publishing workflow filename: publish-release.yml'
+                    exit 1
+                  fi
+
+                  if grep -Eiq 'attestation|oidc|provenance|rekor|sigstore|tlog' target/release/publish.log; then
+                    sleep 30
+                    npx just publish-release
+                    exit 0
+                  fi
+
+                  exit 1

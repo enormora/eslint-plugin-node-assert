@@ -16,6 +16,11 @@
             "groupSlug": "enormora-eslint-config"
         },
         {
+            "matchPackagePatterns": ["^@packtory/"],
+            "groupName": "@packtory dependencies",
+            "groupSlug": "packtory"
+        },
+        {
             "matchDepTypes": ["dependencies", "devDependencies"],
             "matchUpdateTypes": ["minor", "patch"],
             "automerge": true,
