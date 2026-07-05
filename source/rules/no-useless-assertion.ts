@@ -1,12 +1,9 @@
 import assert from 'node:assert';
 import strictAssert from 'node:assert/strict';
-import { AST_NODE_TYPES, ESLintUtils, type TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { isConstant } from '../ast/is-constant.ts';
 import { createAssertBindingTracker, NOT_ASSERT_MODULE } from '../node-assert/method-tracker.ts';
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
+import { createRule } from './create-rule.ts';
 
 const ONE_ARGUMENT_METHOD_NAMES = [ 'ok', 'ifError' ] as const;
 const TWO_ARGUMENT_METHOD_NAMES = [

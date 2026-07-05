@@ -1,5 +1,6 @@
-import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import { createAssertBindingTracker, NOT_ASSERT_MODULE } from '../node-assert/method-tracker.ts';
+import { createRule } from './create-rule.ts';
 
 type AssertMode = 'explicit' | 'semantic';
 type RequireStrictOptions = readonly [
@@ -7,10 +8,6 @@ type RequireStrictOptions = readonly [
         readonly mode?: AssertMode;
     }
 ];
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
 
 const LEGACY_TO_STRICT_METHOD_NAME = new Map<string, string>([
     [ 'equal', 'strictEqual' ],
