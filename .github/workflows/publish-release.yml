@@ -156,6 +156,10 @@ jobs:
                   echo "Verified ${spec} has a registered provenance attestation."
             - name: Configure tag-only release push refs
               run: git config remote.origin.push 'refs/tags/*:refs/tags/*'
+            - name: Configure Git author
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             - name: Publish release
               id: publish-release
               continue-on-error: true
