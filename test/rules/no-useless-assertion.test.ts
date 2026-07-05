@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { noUselessAssertionRule } from "../../source/rules/no-useless-assertion.js";
+import { noUselessAssertionRule } from "../../source/rules/no-useless-assertion.ts";
 
 const ruleTester = new RuleTester();
 

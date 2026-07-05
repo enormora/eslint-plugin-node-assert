@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { noConstantActualRule } from "../../source/rules/no-constant-actual.js";
+import { noConstantActualRule } from "../../source/rules/no-constant-actual.ts";
 
 const ruleTester = new RuleTester();
 

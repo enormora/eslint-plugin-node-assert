@@ -1,6 +1,6 @@
 import * as assert from "node:assert/strict";
 import { suite, test } from "mocha";
-import { ASSERT_MODULES, isAssertModuleSpecifier } from "../../source/node-assert/modules.js";
+import { ASSERT_MODULES, isAssertModuleSpecifier } from "../../source/node-assert/modules.ts";
 
 const NUMERIC_NON_STRING = 42;
 

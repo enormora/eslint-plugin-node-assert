@@ -1,19 +1,19 @@
 /* eslint-disable import/max-dependencies -- central rule barrel intentionally aggregates every rule */
-import { consistentImportRule } from "./rules/consistent-import.js";
-import { noAsyncFunctionInSyncAssertionRule } from "./rules/no-async-function-in-sync-assertion.js";
-import { noAwaitArgumentInRejectsRule } from "./rules/no-await-argument-in-rejects.js";
-import { noConstantActualRule } from "./rules/no-constant-actual.js";
-import { noExpectedValueAsMessageRule } from "./rules/no-expected-value-as-message.js";
-import { noRestrictedAssertionRule } from "./rules/no-restricted-assertion.js";
-import { noUselessAssertionRule } from "./rules/no-useless-assertion.js";
-import { preferComparisonAssertionRule } from "./rules/prefer-comparison-assertion.js";
-import { preferDeepEqualityRule } from "./rules/prefer-deep-equality.js";
-import { preferMatchRule } from "./rules/prefer-match.js";
-import { preferPartialDeepStrictEqualRule } from "./rules/prefer-partial-deep-strict-equal.js";
-import { requireCustomMessageRule } from "./rules/require-custom-message.js";
-import { requireErrorMatcherRule } from "./rules/require-error-matcher.js";
-import { requireValidErrorValidatorReturnRule } from "./rules/require-valid-error-validator-return.js";
-import { requireStrictRule } from "./rules/require-strict.js";
+import { consistentImportRule } from "./rules/consistent-import.ts";
+import { noAsyncFunctionInSyncAssertionRule } from "./rules/no-async-function-in-sync-assertion.ts";
+import { noAwaitArgumentInRejectsRule } from "./rules/no-await-argument-in-rejects.ts";
+import { noConstantActualRule } from "./rules/no-constant-actual.ts";
+import { noExpectedValueAsMessageRule } from "./rules/no-expected-value-as-message.ts";
+import { noRestrictedAssertionRule } from "./rules/no-restricted-assertion.ts";
+import { noUselessAssertionRule } from "./rules/no-useless-assertion.ts";
+import { preferComparisonAssertionRule } from "./rules/prefer-comparison-assertion.ts";
+import { preferDeepEqualityRule } from "./rules/prefer-deep-equality.ts";
+import { preferMatchRule } from "./rules/prefer-match.ts";
+import { preferPartialDeepStrictEqualRule } from "./rules/prefer-partial-deep-strict-equal.ts";
+import { requireCustomMessageRule } from "./rules/require-custom-message.ts";
+import { requireErrorMatcherRule } from "./rules/require-error-matcher.ts";
+import { requireValidErrorValidatorReturnRule } from "./rules/require-valid-error-validator-return.ts";
+import { requireStrictRule } from "./rules/require-strict.ts";
 
 const allRules = {
 	"consistent-import": consistentImportRule,

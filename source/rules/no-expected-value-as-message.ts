@@ -1,8 +1,8 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESTree } from "@typescript-eslint/utils";
-import { isConstant } from "../ast/is-constant.js";
-import { isConstantString } from "../ast/is-constant-string.js";
-import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.js";
-import { isAssertModuleSpecifier } from "../node-assert/modules.js";
+import { isConstant } from "../ast/is-constant.ts";
+import { isConstantString } from "../ast/is-constant-string.ts";
+import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.ts";
+import { isAssertModuleSpecifier } from "../node-assert/modules.ts";
 
 const createRule = ESLintUtils.RuleCreator((name) => {
 	return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;

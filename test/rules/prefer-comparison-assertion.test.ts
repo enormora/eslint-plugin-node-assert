@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { preferComparisonAssertionRule } from "../../source/rules/prefer-comparison-assertion.js";
+import { preferComparisonAssertionRule } from "../../source/rules/prefer-comparison-assertion.ts";
 
 const ruleTester = new RuleTester();
 

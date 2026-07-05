@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { requireCustomMessageRule } from "../../source/rules/require-custom-message.js";
+import { requireCustomMessageRule } from "../../source/rules/require-custom-message.ts";
 
 const ruleTester = new RuleTester();
 

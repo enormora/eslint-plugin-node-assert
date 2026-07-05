@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { requireValidErrorValidatorReturnRule } from "../../source/rules/require-valid-error-validator-return.js";
+import { requireValidErrorValidatorReturnRule } from "../../source/rules/require-valid-error-validator-return.ts";
 
 const ruleTester = new RuleTester();
 

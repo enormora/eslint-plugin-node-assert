@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { preferMatchRule } from "../../source/rules/prefer-match.js";
+import { preferMatchRule } from "../../source/rules/prefer-match.ts";
 
 const ruleTester = new RuleTester();
 

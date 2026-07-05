@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { noRestrictedAssertionRule } from "../../source/rules/no-restricted-assertion.js";
+import { noRestrictedAssertionRule } from "../../source/rules/no-restricted-assertion.ts";
 
 const ruleTester = new RuleTester();
 

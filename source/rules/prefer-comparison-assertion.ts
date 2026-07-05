@@ -3,7 +3,7 @@ import {
 	createAssertBindingTracker,
 	NOT_ASSERT_MODULE,
 	type ResolvedMethodCall
-} from "../node-assert/method-tracker.js";
+} from "../node-assert/method-tracker.ts";
 
 const createRule = ESLintUtils.RuleCreator((name) => {
 	return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;

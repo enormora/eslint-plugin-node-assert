@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { preferDeepEqualityRule } from "../../source/rules/prefer-deep-equality.js";
+import { preferDeepEqualityRule } from "../../source/rules/prefer-deep-equality.ts";
 
 const ruleTester = new RuleTester();
 

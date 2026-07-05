@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { noAwaitArgumentInRejectsRule } from "../../source/rules/no-await-argument-in-rejects.js";
+import { noAwaitArgumentInRejectsRule } from "../../source/rules/no-await-argument-in-rejects.ts";
 
 const ruleTester = new RuleTester();
 

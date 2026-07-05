@@ -18,6 +18,8 @@
 		"exactOptionalPropertyTypes": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
+		"rewriteRelativeImportExtensions": true,
+		"erasableSyntaxOnly": true,
 		"verbatimModuleSyntax": true,
 		"skipLibCheck": true
 	}

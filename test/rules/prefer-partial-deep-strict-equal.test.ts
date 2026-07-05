@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { preferPartialDeepStrictEqualRule } from "../../source/rules/prefer-partial-deep-strict-equal.js";
+import { preferPartialDeepStrictEqualRule } from "../../source/rules/prefer-partial-deep-strict-equal.ts";
 
 const ruleTester = new RuleTester();
 
