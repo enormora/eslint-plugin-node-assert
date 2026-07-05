@@ -13,10 +13,10 @@ This rule reports such runs. It does not autofix because merging into a partial 
 ### Reported pattern
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.strictEqual(user.id, 1);
-assert.strictEqual(user.profile.name, "Alice");
+assert.strictEqual(user.profile.name, 'Alice');
 ```
 
 The two calls can be merged into:
@@ -25,7 +25,7 @@ The two calls can be merged into:
 assert.partialDeepStrictEqual(user, {
     id: 1,
     profile: {
-        name: "Alice"
+        name: 'Alice'
     }
 });
 ```
@@ -44,7 +44,7 @@ A call participates in a run when:
 ### Patterns that are not reported
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 // Single eligible call has nothing to merge.
 assert.strictEqual(user.id, 1);
@@ -55,13 +55,13 @@ assert.strictEqual(account.balance, 100);
 
 // Methods outside the rule's scope break the run.
 assert.strictEqual(user.id, 1);
-assert.notStrictEqual(user.name, "Alice");
-assert.equal(user.email, "a@b");
+assert.notStrictEqual(user.name, 'Alice');
+assert.equal(user.email, 'a@b');
 assert.match(user.name, /Alice/);
 
 // A custom failure message would be lost during the merge.
-assert.strictEqual(user.id, 1, "id mismatch");
-assert.strictEqual(user.name, "Alice", "name mismatch");
+assert.strictEqual(user.id, 1, 'id mismatch');
+assert.strictEqual(user.name, 'Alice', 'name mismatch');
 
 // Computed access disqualifies the call.
 assert.strictEqual(user[key], 1);
@@ -73,8 +73,8 @@ assert.strictEqual(this.user.id, 1);
 
 // Statements between the calls break the run.
 assert.strictEqual(user.id, 1);
-console.log("between");
-assert.strictEqual(user.name, "Alice");
+console.log('between');
+assert.strictEqual(user.name, 'Alice');
 ```
 
 ### Caveats

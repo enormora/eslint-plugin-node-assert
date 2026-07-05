@@ -1,260 +1,274 @@
-import { AST_NODE_TYPES, ASTUtils, ESLintUtils, type TSESLint, type TSESTree } from "@typescript-eslint/utils";
-import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.ts";
-import { isAssertModuleSpecifier } from "../node-assert/modules.ts";
+import { AST_NODE_TYPES, ASTUtils, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import {
+    createAssertBindingTracker,
+    NOT_ASSERT_MODULE,
+    type AssertBindingTracker
+} from '../node-assert/method-tracker.ts';
+import { isAssertModuleSpecifier } from '../node-assert/modules.ts';
 
-const createRule = ESLintUtils.RuleCreator((name) => {
-	return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
+const createRule = ESLintUtils.RuleCreator(function (name) {
+    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
 });
 
-const synchronousAssertionMethodNames: ReadonlySet<string> = new Set(["throws", "doesNotThrow"]);
+const synchronousAssertionMethodNames: ReadonlySet<string> = new Set([ 'throws', 'doesNotThrow' ]);
+const transparentExpressionNodeTypes: ReadonlySet<string> = new Set([
+    AST_NODE_TYPES.TSAsExpression,
+    AST_NODE_TYPES.TSSatisfiesExpression,
+    AST_NODE_TYPES.TSNonNullExpression,
+    AST_NODE_TYPES.TSTypeAssertion
+]);
 const asynchronousReplacementMethodNames: Readonly<Record<string, string>> = {
-	doesNotThrow: "doesNotReject",
-	throws: "rejects"
+    doesNotThrow: 'doesNotReject',
+    throws: 'rejects'
 };
 
 type AsyncFunctionNode = Readonly<
-	TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression
+    TSESTree.ArrowFunctionExpression | TSESTree.FunctionDeclaration | TSESTree.FunctionExpression
+>;
+type TransparentExpression = Readonly<
+    TSESTree.TSAsExpression | TSESTree.TSNonNullExpression | TSESTree.TSSatisfiesExpression | TSESTree.TSTypeAssertion
 >;
 
 function isTrackedAssertionMethodName(methodName: string): boolean {
-	return synchronousAssertionMethodNames.has(methodName);
+    return synchronousAssertionMethodNames.has(methodName);
 }
 
 function resolveStrictReExport(propertyName: string): null | undefined {
-	return propertyName === "strict" ? null : undefined;
+    return propertyName === 'strict' ? null : undefined;
 }
 
 function getFirstArgument(
-	callArguments: readonly TSESTree.CallExpressionArgument[]
+    callArguments: readonly TSESTree.CallExpressionArgument[]
 ): Readonly<TSESTree.Expression> | undefined {
-	const [firstArgument] = callArguments;
-	if (firstArgument === undefined || firstArgument.type === AST_NODE_TYPES.SpreadElement) {
-		return undefined;
-	}
-	return firstArgument;
+    const [ firstArgument ] = callArguments;
+    if (firstArgument === undefined || firstArgument.type === AST_NODE_TYPES.SpreadElement) {
+        return undefined;
+    }
+    return firstArgument;
+}
+
+function isTransparentExpression(node: Readonly<TSESTree.Expression>): node is TransparentExpression {
+    return transparentExpressionNodeTypes.has(node.type);
 }
 
 function unwrapTransparentExpression(node: Readonly<TSESTree.Expression>): Readonly<TSESTree.Expression> {
-	if (
-		node.type === AST_NODE_TYPES.TSAsExpression ||
-		node.type === AST_NODE_TYPES.TSSatisfiesExpression ||
-		node.type === AST_NODE_TYPES.TSNonNullExpression ||
-		node.type === AST_NODE_TYPES.TSTypeAssertion
-	) {
-		return unwrapTransparentExpression(node.expression);
-	}
-	return node;
+    if (isTransparentExpression(node)) {
+        return unwrapTransparentExpression(node.expression);
+    }
+    return node;
 }
 
 function isAsyncFunctionNode(node: Readonly<TSESTree.Node>): node is AsyncFunctionNode {
-	if (!("async" in node) || !node.async) {
-		return false;
-	}
-	return (
-		node.type === AST_NODE_TYPES.ArrowFunctionExpression ||
-		node.type === AST_NODE_TYPES.FunctionExpression ||
-		node.type === AST_NODE_TYPES.FunctionDeclaration
-	);
+    if (node.type === AST_NODE_TYPES.ArrowFunctionExpression) {
+        return node.async;
+    }
+    if (node.type === AST_NODE_TYPES.FunctionDeclaration) {
+        return node.async;
+    }
+    if (node.type === AST_NODE_TYPES.FunctionExpression) {
+        return node.async;
+    }
+    return false;
 }
 
 function getConstVariableDeclarator(
-	definition: Readonly<TSESLint.Scope.Definition>
+    definition: Readonly<TSESLint.Scope.Definition>
 ): Readonly<TSESTree.VariableDeclarator> | undefined {
-	if (
-		definition.node.type !== AST_NODE_TYPES.VariableDeclarator ||
-		definition.parent?.type !== AST_NODE_TYPES.VariableDeclaration ||
-		definition.parent.kind !== "const"
-	) {
-		return undefined;
-	}
-	return definition.node;
+    if (
+        definition.node.type !== AST_NODE_TYPES.VariableDeclarator ||
+        definition.parent?.type !== AST_NODE_TYPES.VariableDeclaration ||
+        definition.parent.kind !== 'const'
+    ) {
+        return undefined;
+    }
+    return definition.node;
 }
 
 function getAliasedVariable(
-	variable: Readonly<TSESLint.Scope.Variable>,
-	identifier: Readonly<TSESTree.Identifier>,
-	visitedVariableNames: ReadonlySet<string>
+    variable: Readonly<TSESLint.Scope.Variable>,
+    identifier: Readonly<TSESTree.Identifier>,
+    visitedVariableNames: ReadonlySet<string>
 ): Readonly<TSESLint.Scope.Variable> | undefined {
-	if (visitedVariableNames.has(identifier.name)) {
-		return undefined;
-	}
-	return ASTUtils.findVariable(variable.scope, identifier.name) ?? undefined;
+    if (visitedVariableNames.has(identifier.name)) {
+        return undefined;
+    }
+    return ASTUtils.findVariable(variable.scope, identifier.name) ?? undefined;
 }
 
 function getNextVisitedVariableNames(
-	visitedVariableNames: ReadonlySet<string>,
-	variableName: string
+    visitedVariableNames: ReadonlySet<string>,
+    variableName: string
 ): ReadonlySet<string> {
-	return new Set([...visitedVariableNames, variableName]);
+    return new Set([ ...visitedVariableNames, variableName ]);
 }
 
 function resolveAsyncFunctionFromExpression(
-	expression: Readonly<TSESTree.Expression>,
-	variable: Readonly<TSESLint.Scope.Variable>,
-	visitedVariableNames: ReadonlySet<string>
+    expression: Readonly<TSESTree.Expression>,
+    variable: Readonly<TSESLint.Scope.Variable>,
+    visitedVariableNames: ReadonlySet<string>
 ): AsyncFunctionNode | undefined {
-	const resolvedExpression = unwrapTransparentExpression(expression);
-	if (isAsyncFunctionNode(resolvedExpression)) {
-		return resolvedExpression;
-	}
-	if (resolvedExpression.type !== AST_NODE_TYPES.Identifier) {
-		return undefined;
-	}
-	const aliasedVariable = getAliasedVariable(variable, resolvedExpression, visitedVariableNames);
-	if (aliasedVariable === undefined) {
-		return undefined;
-	}
-	// eslint-disable-next-line @typescript-eslint/no-use-before-define -- mutually recursive alias resolution
-	return resolveAsyncFunctionFromVariable(
-		aliasedVariable,
-		getNextVisitedVariableNames(visitedVariableNames, resolvedExpression.name)
-	);
+    const resolvedExpression = unwrapTransparentExpression(expression);
+    if (isAsyncFunctionNode(resolvedExpression)) {
+        return resolvedExpression;
+    }
+    if (resolvedExpression.type !== AST_NODE_TYPES.Identifier) {
+        return undefined;
+    }
+    const aliasedVariable = getAliasedVariable(variable, resolvedExpression, visitedVariableNames);
+    if (aliasedVariable === undefined) {
+        return undefined;
+    }
+    // eslint-disable-next-line @typescript-eslint/no-use-before-define -- mutually recursive alias resolution
+    return resolveAsyncFunctionFromVariable(
+        aliasedVariable,
+        getNextVisitedVariableNames(visitedVariableNames, resolvedExpression.name)
+    );
 }
 
 function getAsyncFunctionDeclaration(
-	definition: Readonly<TSESLint.Scope.Definition>
+    definition: Readonly<TSESLint.Scope.Definition>
 ): Readonly<TSESTree.FunctionDeclaration> | undefined {
-	return definition.node.type === AST_NODE_TYPES.FunctionDeclaration && definition.node.async
-		? definition.node
-		: undefined;
+    return definition.node.type === AST_NODE_TYPES.FunctionDeclaration && definition.node.async
+        ? definition.node
+        : undefined;
 }
 
 function resolveAsyncFunctionFromDefinition(
-	definition: Readonly<TSESLint.Scope.Definition>,
-	variable: Readonly<TSESLint.Scope.Variable>,
-	visitedVariableNames: ReadonlySet<string>
+    definition: Readonly<TSESLint.Scope.Definition>,
+    variable: Readonly<TSESLint.Scope.Variable>,
+    visitedVariableNames: ReadonlySet<string>
 ): AsyncFunctionNode | undefined {
-	const asyncFunctionDeclaration = getAsyncFunctionDeclaration(definition);
-	if (asyncFunctionDeclaration !== undefined) {
-		return asyncFunctionDeclaration;
-	}
-	const variableDeclarator = getConstVariableDeclarator(definition);
-	if (variableDeclarator?.init === null || variableDeclarator?.init === undefined) {
-		return undefined;
-	}
-	return resolveAsyncFunctionFromExpression(variableDeclarator.init, variable, visitedVariableNames);
+    const asyncFunctionDeclaration = getAsyncFunctionDeclaration(definition);
+    if (asyncFunctionDeclaration !== undefined) {
+        return asyncFunctionDeclaration;
+    }
+    const variableDeclarator = getConstVariableDeclarator(definition);
+    if (variableDeclarator?.init === null || variableDeclarator?.init === undefined) {
+        return undefined;
+    }
+    return resolveAsyncFunctionFromExpression(variableDeclarator.init, variable, visitedVariableNames);
 }
 
 function resolveAsyncFunctionFromVariable(
-	variable: Readonly<TSESLint.Scope.Variable>,
-	visitedVariableNames: ReadonlySet<string>
+    variable: Readonly<TSESLint.Scope.Variable>,
+    visitedVariableNames: ReadonlySet<string>
 ): AsyncFunctionNode | undefined {
-	return variable.defs
-		.map((definition) => {
-			return resolveAsyncFunctionFromDefinition(definition, variable, visitedVariableNames);
-		})
-		.find((asyncFunctionNode) => {
-			return asyncFunctionNode !== undefined;
-		});
+    return variable
+        .defs
+        .map(function (definition) {
+            return resolveAsyncFunctionFromDefinition(definition, variable, visitedVariableNames);
+        })
+        .find(function (asyncFunctionNode) {
+            return asyncFunctionNode !== undefined;
+        });
 }
 
 function resolveAsyncFunctionArgument(
-	firstArgument: Readonly<TSESTree.Expression>,
-	// eslint-disable-next-line functional/prefer-immutable-types -- ESLint scope helpers require the mutable Scope shape
-	scope: TSESLint.Scope.Scope
+    firstArgument: Readonly<TSESTree.Expression>,
+    scope: TSESLint.Scope.Scope
 ): AsyncFunctionNode | undefined {
-	const resolvedFirstArgument = unwrapTransparentExpression(firstArgument);
-	if (isAsyncFunctionNode(resolvedFirstArgument)) {
-		return resolvedFirstArgument;
-	}
-	if (resolvedFirstArgument.type !== AST_NODE_TYPES.Identifier) {
-		return undefined;
-	}
-	const variable = ASTUtils.findVariable(scope, resolvedFirstArgument.name) ?? undefined;
-	if (variable === undefined) {
-		return undefined;
-	}
-	return resolveAsyncFunctionFromVariable(variable, new Set([resolvedFirstArgument.name]));
+    const resolvedFirstArgument = unwrapTransparentExpression(firstArgument);
+    if (isAsyncFunctionNode(resolvedFirstArgument)) {
+        return resolvedFirstArgument;
+    }
+    if (resolvedFirstArgument.type !== AST_NODE_TYPES.Identifier) {
+        return undefined;
+    }
+    const variable = ASTUtils.findVariable(scope, resolvedFirstArgument.name) ?? undefined;
+    if (variable === undefined) {
+        return undefined;
+    }
+    return resolveAsyncFunctionFromVariable(variable, new Set([ resolvedFirstArgument.name ]));
 }
 
 function reportAsyncFunctionArgument(
-	context: Readonly<TSESLint.RuleContext<"no-async-function-in-sync-assertion", readonly []>>,
-	methodName: string,
-	asyncFunctionArgument: AsyncFunctionNode
+    context: Readonly<TSESLint.RuleContext<'no-async-function-in-sync-assertion', readonly []>>,
+    methodName: string,
+    asyncFunctionArgument: AsyncFunctionNode
 ): void {
-	context.report({
-		messageId: "no-async-function-in-sync-assertion",
-		node: asyncFunctionArgument,
-		data: {
-			methodName,
-			asyncMethodName: asynchronousReplacementMethodNames[methodName]
-		}
-	});
+    context.report({
+        messageId: 'no-async-function-in-sync-assertion',
+        node: asyncFunctionArgument,
+        data: {
+            methodName,
+            asyncMethodName: asynchronousReplacementMethodNames[methodName]
+        }
+    });
 }
 
 type ReportableAsyncAssertion = {
-	readonly asyncFunctionArgument: AsyncFunctionNode;
-	readonly methodName: string;
+    readonly asyncFunctionArgument: AsyncFunctionNode;
+    readonly methodName: string;
 };
 
 function getReportableAsyncAssertion(
-	tracker: ReturnType<typeof createAssertBindingTracker<null>>,
-	sourceCode: Readonly<TSESLint.SourceCode>,
-	node: Readonly<TSESTree.CallExpression>
+    tracker: AssertBindingTracker<null>,
+    sourceCode: Readonly<TSESLint.SourceCode>,
+    node: Readonly<TSESTree.CallExpression>
 ): ReportableAsyncAssertion | undefined {
-	const scope = sourceCode.getScope(node);
-	const resolvedMethodCall = tracker.resolveMethodCall(node.callee, scope);
-	if (resolvedMethodCall === undefined) {
-		return undefined;
-	}
-	const firstArgument = getFirstArgument(node.arguments);
-	if (firstArgument === undefined) {
-		return undefined;
-	}
-	const asyncFunctionArgument = resolveAsyncFunctionArgument(firstArgument, scope);
-	return asyncFunctionArgument === undefined
-		? undefined
-		: { methodName: resolvedMethodCall.methodName, asyncFunctionArgument };
+    const scope = sourceCode.getScope(node);
+    const resolvedMethodCall = tracker.resolveMethodCall(node.callee, scope);
+    if (resolvedMethodCall === undefined) {
+        return undefined;
+    }
+    const firstArgument = getFirstArgument(node.arguments);
+    if (firstArgument === undefined) {
+        return undefined;
+    }
+    const asyncFunctionArgument = resolveAsyncFunctionArgument(firstArgument, scope);
+    return asyncFunctionArgument === undefined
+        ? undefined
+        : { methodName: resolvedMethodCall.methodName, asyncFunctionArgument };
 }
 
 function checkSyncAssertionCall(
-	context: Readonly<TSESLint.RuleContext<"no-async-function-in-sync-assertion", readonly []>>,
-	tracker: ReturnType<typeof createAssertBindingTracker<null>>,
-	sourceCode: Readonly<TSESLint.SourceCode>,
-	node: Readonly<TSESTree.CallExpression>
+    context: Readonly<TSESLint.RuleContext<'no-async-function-in-sync-assertion', readonly []>>,
+    tracker: AssertBindingTracker<null>,
+    sourceCode: Readonly<TSESLint.SourceCode>,
+    node: Readonly<TSESTree.CallExpression>
 ): void {
-	const reportableAsyncAssertion = getReportableAsyncAssertion(tracker, sourceCode, node);
-	if (reportableAsyncAssertion === undefined) {
-		return;
-	}
-	reportAsyncFunctionArgument(
-		context,
-		reportableAsyncAssertion.methodName,
-		reportableAsyncAssertion.asyncFunctionArgument
-	);
+    const reportableAsyncAssertion = getReportableAsyncAssertion(tracker, sourceCode, node);
+    if (reportableAsyncAssertion === undefined) {
+        return;
+    }
+    reportAsyncFunctionArgument(
+        context,
+        reportableAsyncAssertion.methodName,
+        reportableAsyncAssertion.asyncFunctionArgument
+    );
 }
 
 export const noAsyncFunctionInSyncAssertionRule = createRule({
-	name: "no-async-function-in-sync-assertion",
-	meta: {
-		docs: {
-			description: "Disallow passing async functions to synchronous Node.js assert methods"
-		},
-		messages: {
-			"no-async-function-in-sync-assertion":
-				"`assert.{{methodName}}()` does not await async functions. Use `assert.{{asyncMethodName}}()` instead"
-		},
-		type: "problem",
-		schema: []
-	},
-	defaultOptions: [],
+    name: 'no-async-function-in-sync-assertion',
+    meta: {
+        docs: {
+            description: 'Disallow passing async functions to synchronous Node.js assert methods'
+        },
+        messages: {
+            'no-async-function-in-sync-assertion':
+                '`assert.{{methodName}}()` does not await async functions. Use `assert.{{asyncMethodName}}()` instead'
+        },
+        type: 'problem',
+        schema: []
+    },
+    defaultOptions: [],
 
-	create(context) {
-		const tracker = createAssertBindingTracker<null>({
-			isAssertMethod: isTrackedAssertionMethodName,
-			classifyModule(specifier) {
-				return isAssertModuleSpecifier(specifier) ? null : NOT_ASSERT_MODULE;
-			},
-			resolveNamespaceProperty: resolveStrictReExport
-		});
-		const { sourceCode } = context;
+    create(context) {
+        const tracker = createAssertBindingTracker<null>({
+            isAssertMethod: isTrackedAssertionMethodName,
+            classifyModule(specifier) {
+                return isAssertModuleSpecifier(specifier) ? null : NOT_ASSERT_MODULE;
+            },
+            resolveNamespaceProperty: resolveStrictReExport
+        });
+        const { sourceCode } = context;
 
-		return {
-			ImportDeclaration: tracker.processImport,
-			VariableDeclaration: tracker.processVariableDeclaration,
-			CallExpression(node) {
-				checkSyncAssertionCall(context, tracker, sourceCode, node);
-			}
-		};
-	}
+        return {
+            ImportDeclaration: tracker.processImport,
+            VariableDeclaration: tracker.processVariableDeclaration,
+            CallExpression(node) {
+                checkSyncAssertionCall(context, tracker, sourceCode, node);
+            }
+        };
+    }
 });

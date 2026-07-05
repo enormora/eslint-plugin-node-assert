@@ -18,38 +18,38 @@ This rule reports those misuses. It does not autofix because the appropriate rep
 ### Reported patterns
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert(value, true); // boolean treated as the assertion message
 assert.ok(result, false); // the second arg is the message, not an expected value
 assert.ok(count, 3); // intended `strictEqual(count, 3)`
-assert.ok(user, { name: "Alice" }); // intended `deepStrictEqual(user, { name: 'Alice' })`
+assert.ok(user, { name: 'Alice' }); // intended `deepStrictEqual(user, { name: 'Alice' })`
 assert.ok(value, /pattern/); // a regex is not a message either
 assert.ok(value, null); // null and undefined are still constants
 
-assert.throws(fn, "invalid input"); // a string is treated as the message, not an error matcher
-await assert.rejects(promise, "invalid input");
+assert.throws(fn, 'invalid input'); // a string is treated as the message, not an error matcher
+await assert.rejects(promise, 'invalid input');
 assert.throws(() => fn(), `invalid input`); // constant template literals as well
-assert.doesNotThrow(fn, "boom");
-assert.doesNotReject(promise, "boom");
+assert.doesNotThrow(fn, 'boom');
+assert.doesNotReject(promise, 'boom');
 ```
 
 ### Patterns that are not reported
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.ok(value); // single argument
-assert.ok(value, "must be truthy"); // a string literal is a valid message
+assert.ok(value, 'must be truthy'); // a string literal is a valid message
 assert.ok(value, `must be truthy`); // constant template literal too
 assert.ok(value, `count: ${count}`); // dynamic template, not a constant
 assert.ok(value, message); // any non-constant expression is fine
 
 assert.throws(fn, /invalid/);
 assert.throws(fn, TypeError);
-assert.throws(fn, { message: "boom" });
+assert.throws(fn, { message: 'boom' });
 assert.throws(fn, (error) => error instanceof TypeError);
-assert.throws(fn, /invalid/, "custom failure message"); // strings are fine in the third slot
+assert.throws(fn, /invalid/, 'custom failure message'); // strings are fine in the third slot
 ```
 
 ### What counts as an "expected value"

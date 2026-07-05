@@ -23,13 +23,13 @@ This rule forbids legacy equality method names from non-strict assert bindings:
 Invalid in `semantic` mode:
 
 ```js
-import assert from "node:assert";
+import assert from 'node:assert';
 assert.equal(actual, expected);
 ```
 
 Valid in `semantic` mode:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 assert.equal(actual, expected);
 ```

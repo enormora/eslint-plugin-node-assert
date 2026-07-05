@@ -13,27 +13,27 @@ This rule requires an explicit matcher in the second argument slot and can optio
 ### Reported patterns
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.throws(fn);
 await assert.rejects(promise);
 
-await assert.rejects(promise, "invalid input");
+await assert.rejects(promise, 'invalid input');
 
-await assert.rejects(promise, /invalid input/, "wrong config"); // only when regex matchers are disallowed
+await assert.rejects(promise, /invalid input/, 'wrong config'); // only when regex matchers are disallowed
 
-await assert.rejects(promise, { code: "ERR_INVALID_INPUT" }); // when `message` is required
+await assert.rejects(promise, { code: 'ERR_INVALID_INPUT' }); // when `message` is required
 ```
 
 ### Allowed by default
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.throws(fn, TypeError);
 await assert.rejects(promise, /invalid input/);
-await assert.rejects(promise, { message: "invalid input" });
-await assert.rejects(promise, (error) => error.message === "invalid input");
+await assert.rejects(promise, { message: 'invalid input' });
+await assert.rejects(promise, (error) => error.message === 'invalid input');
 ```
 
 ## Options
@@ -42,12 +42,12 @@ Default configuration:
 
 ```json
 {
-  "node-assert/require-error-matcher": [
-    "error",
-    {
-      "allowedMatchers": ["object", "constructor", "validation-function", "regex"]
-    }
-  ]
+    "node-assert/require-error-matcher": [
+        "error",
+        {
+            "allowedMatchers": ["object", "constructor", "validation-function", "regex"]
+        }
+    ]
 }
 ```
 
@@ -64,12 +64,12 @@ Example:
 
 ```json
 {
-  "node-assert/require-error-matcher": [
-    "error",
-    {
-      "allowedMatchers": ["object"]
-    }
-  ]
+    "node-assert/require-error-matcher": [
+        "error",
+        {
+            "allowedMatchers": ["object"]
+        }
+    ]
 }
 ```
 
@@ -81,15 +81,15 @@ Requires object matchers to include every listed property.
 
 ```json
 {
-  "node-assert/require-error-matcher": [
-    "error",
-    {
-      "allowedMatchers": ["object"],
-      "objectMatcher": {
-        "requiredProperties": ["message"]
-      }
-    }
-  ]
+    "node-assert/require-error-matcher": [
+        "error",
+        {
+            "allowedMatchers": ["object"],
+            "objectMatcher": {
+                "requiredProperties": ["message"]
+            }
+        }
+    ]
 }
 ```
 
@@ -99,15 +99,15 @@ Requires object matchers to include at least one property from the configured li
 
 ```json
 {
-  "node-assert/require-error-matcher": [
-    "error",
-    {
-      "allowedMatchers": ["object"],
-      "objectMatcher": {
-        "requireAtLeastOneProperty": ["message", "code", "name"]
-      }
-    }
-  ]
+    "node-assert/require-error-matcher": [
+        "error",
+        {
+            "allowedMatchers": ["object"],
+            "objectMatcher": {
+                "requireAtLeastOneProperty": ["message", "code", "name"]
+            }
+        }
+    ]
 }
 ```
 

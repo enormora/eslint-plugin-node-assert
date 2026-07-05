@@ -13,10 +13,10 @@
 Examples of **incorrect** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 await assert.rejects(await doThing(), {
-    message: "invalid input"
+    message: 'invalid input'
 });
 
 await assert.doesNotReject(await doThing());
@@ -25,14 +25,14 @@ await assert.doesNotReject(await doThing());
 Examples of **correct** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 await assert.rejects(doThing(), {
-    message: "invalid input"
+    message: 'invalid input'
 });
 
 await assert.rejects(() => doThing(), {
-    message: "invalid input"
+    message: 'invalid input'
 });
 
 await assert.doesNotReject(doThing());

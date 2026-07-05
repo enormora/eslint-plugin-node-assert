@@ -1,7 +1,7 @@
 {
-	"require": "./test/mocha-global-setup.js",
-	"extension": ["ts"],
-	"spec": "test/**/*.test.ts",
-	"ui": "tdd",
-	"reporter": "dot"
+    "require": "./test/mocha-global-setup.js",
+    "extension": ["ts"],
+    "spec": "test/**/*.test.ts",
+    "ui": "tdd",
+    "reporter": "dot"
 }
