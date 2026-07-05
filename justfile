@@ -17,5 +17,22 @@ test-unit:
 update-eslint-docs: compile
 	eslint-doc-generator
 
-release: compile lint test-unit update-eslint-docs
-	release-it
+test: lint test-unit packtory-dry-run
+
+packtory-dry-run: update-eslint-docs
+	packtory publish
+
+release-plan: update-eslint-docs
+	packtory release
+
+release-diff: update-eslint-docs
+	packtory release-diff
+
+changelog: update-eslint-docs
+	packtory changelog
+
+prepare-release: update-eslint-docs
+	packtory release --write-changelog --commit --no-dry-run
+
+publish-release: update-eslint-docs
+	packtory release --publish --tag --push --github-release --no-dry-run

@@ -1,0 +1,111 @@
+---
+name: Release
+
+on:
+    workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+    group: release-pr
+
+jobs:
+    prepare-release:
+        runs-on: ubuntu-24.04
+        name: Prepare release pull request
+        permissions:
+            contents: write # Required to push the generated changelog commit to the release branch.
+            pull-requests: write # Required to create, update, and close release pull requests.
+            issues: write # Required to apply the build label to the release pull request.
+        env:
+            GH_TOKEN: ${{ github.token }}
+            GITHUB_TOKEN: ${{ github.token }}
+            RELEASE_BRANCH: release/eslint-plugin-node-assert
+            RELEASE_PR_BODY: Updates CHANGELOG.md for the next @enormora/eslint-plugin-node-assert release.
+            RELEASE_PR_TITLE: Prepare release
+        steps:
+            - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+              with:
+                  ref: main
+                  fetch-depth: 0
+                  persist-credentials: true
+            - name: Use Node.js
+              uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+              with:
+                  node-version: 26.x
+            - name: Install dependencies from the lockfile
+              run: npm clean-install --ignore-scripts
+            - name: Verify registry signatures for installed dependencies
+              run: npm audit signatures
+            - name: Verify `@packtory/cli` ships with a provenance attestation
+              run: |
+                  version=$(jq -r '.devDependencies["@packtory/cli"]' package.json)
+                  spec="@packtory/cli@${version}"
+                  attestation=$(npm view "${spec}" --json | jq -r '.dist.attestations // empty')
+                  if [ -z "${attestation}" ]; then
+                    echo "::error::${spec} is missing a provenance attestation; refusing to prepare a release"
+                    exit 1
+                  fi
+                  echo "Verified ${spec} has a registered provenance attestation."
+            - name: Configure Git author
+              run: |
+                  git config user.name 'github-actions[bot]'
+                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            - name: Prepare release changelog commit
+              id: prepare-release
+              run: |
+                  starting_commit=$(git rev-parse HEAD)
+                  npx just prepare-release
+
+                  if [ "$(git rev-parse HEAD)" = "${starting_commit}" ]; then
+                    echo "created-release-commit=false" >> "${GITHUB_OUTPUT}"
+                    exit 0
+                  fi
+
+                  echo "created-release-commit=true" >> "${GITHUB_OUTPUT}"
+            - name: Close stale release pull request and delete release branch
+              if: steps.prepare-release.outputs.created-release-commit == 'false'
+              run: |
+                  release_pr_number=$(
+                    gh pr list \
+                      --head "${RELEASE_BRANCH}" \
+                      --base main \
+                      --state open \
+                      --json number \
+                      --jq '.[0].number // empty'
+                  )
+
+                  if [ -n "${release_pr_number}" ]; then
+                    gh pr close "${release_pr_number}" --comment 'No release changelog changes were generated.'
+                  fi
+
+                  git push origin --delete "${RELEASE_BRANCH}" || true
+            - name: Push release branch
+              if: steps.prepare-release.outputs.created-release-commit == 'true'
+              run: git push origin "HEAD:refs/heads/${RELEASE_BRANCH}" --force-with-lease
+            - name: Create or update release pull request
+              if: steps.prepare-release.outputs.created-release-commit == 'true'
+              run: |
+                  release_pr_number=$(
+                    gh pr list \
+                      --head "${RELEASE_BRANCH}" \
+                      --base main \
+                      --state open \
+                      --json number \
+                      --jq '.[0].number // empty'
+                  )
+
+                  if [ -n "${release_pr_number}" ]; then
+                    gh pr edit "${release_pr_number}" \
+                      --title "${RELEASE_PR_TITLE}" \
+                      --body "${RELEASE_PR_BODY}" \
+                      --add-label build
+                    exit 0
+                  fi
+
+                  gh pr create \
+                    --head "${RELEASE_BRANCH}" \
+                    --base main \
+                    --title "${RELEASE_PR_TITLE}" \
+                    --body "${RELEASE_PR_BODY}" \
+                    --label build
