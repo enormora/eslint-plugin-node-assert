@@ -1,5 +1,5 @@
 import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from "@typescript-eslint/utils";
-import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.js";
+import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.ts";
 
 type AssertMode = "explicit" | "semantic";
 type RequireStrictOptions = readonly [

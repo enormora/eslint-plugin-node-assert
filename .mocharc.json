@@ -1,6 +1,7 @@
 {
 	"require": "./test/mocha-global-setup.js",
-	"spec": "target/build/test/**/*.test.js",
+	"extension": ["ts"],
+	"spec": "test/**/*.test.ts",
 	"ui": "tdd",
 	"reporter": "dot"
 }

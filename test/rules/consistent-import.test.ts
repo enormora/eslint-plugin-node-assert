@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { consistentImportRule } from "../../source/rules/consistent-import.js";
+import { consistentImportRule } from "../../source/rules/consistent-import.ts";
 
 const ruleTester = new RuleTester();
 

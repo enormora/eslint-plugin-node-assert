@@ -2,9 +2,9 @@ import * as assert from "node:assert/strict";
 import { suite, test } from "mocha";
 import type { Rule } from "eslint";
 import type { TSESLint, TSESTree } from "@typescript-eslint/utils";
-import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../../source/node-assert/method-tracker.js";
-import { isAssertModuleSpecifier } from "../../source/node-assert/modules.js";
-import { expectNoLintFailure, runProbeRule } from "../helpers/linter-runner.js";
+import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../../source/node-assert/method-tracker.ts";
+import { isAssertModuleSpecifier } from "../../source/node-assert/modules.ts";
+import { expectNoLintFailure, runProbeRule } from "../helpers/linter-runner.ts";
 
 const ASSERT_METHODS: ReadonlySet<string> = new Set(["strictEqual", "deepStrictEqual", "ifError"]);
 

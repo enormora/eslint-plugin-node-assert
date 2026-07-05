@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { noAsyncFunctionInSyncAssertionRule } from "../../source/rules/no-async-function-in-sync-assertion.js";
+import { noAsyncFunctionInSyncAssertionRule } from "../../source/rules/no-async-function-in-sync-assertion.ts";
 
 const ruleTester = new RuleTester();
 

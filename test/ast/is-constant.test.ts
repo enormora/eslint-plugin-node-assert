@@ -2,8 +2,8 @@ import * as assert from "node:assert/strict";
 import { suite, test } from "mocha";
 import type { Rule } from "eslint";
 import type { TSESTree } from "@typescript-eslint/utils";
-import { isConstant } from "../../source/ast/is-constant.js";
-import { expectNoLintFailure, runProbeRule } from "../helpers/linter-runner.js";
+import { isConstant } from "../../source/ast/is-constant.ts";
+import { expectNoLintFailure, runProbeRule } from "../helpers/linter-runner.ts";
 
 function evaluate(expressionSource: string): boolean {
 	const observations: boolean[] = [];

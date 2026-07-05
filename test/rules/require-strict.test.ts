@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { requireStrictRule } from "../../source/rules/require-strict.js";
+import { requireStrictRule } from "../../source/rules/require-strict.ts";
 
 const ruleTester = new RuleTester();
 

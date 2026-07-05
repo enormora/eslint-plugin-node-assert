@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { noExpectedValueAsMessageRule } from "../../source/rules/no-expected-value-as-message.js";
+import { noExpectedValueAsMessageRule } from "../../source/rules/no-expected-value-as-message.ts";
 
 const ruleTester = new RuleTester();
 

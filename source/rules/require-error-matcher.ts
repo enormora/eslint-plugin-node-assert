@@ -1,8 +1,8 @@
 import { ESLintUtils, type TSESLint, type TSESTree } from "@typescript-eslint/utils";
 import type { JSONSchema4 } from "@typescript-eslint/utils/json-schema";
-import { isConstantString } from "../ast/is-constant-string.js";
-import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.js";
-import { isAssertModuleSpecifier } from "../node-assert/modules.js";
+import { isConstantString } from "../ast/is-constant-string.ts";
+import { createAssertBindingTracker, NOT_ASSERT_MODULE } from "../node-assert/method-tracker.ts";
+import { isAssertModuleSpecifier } from "../node-assert/modules.ts";
 import {
 	collectObjectPropertyNames,
 	defaultAllowedMatchers,
@@ -16,7 +16,7 @@ import {
 	type MatcherKind,
 	type ObjectMatcherRequirements,
 	resolveMatcherClassification
-} from "./require-error-matcher-support.js";
+} from "./require-error-matcher-support.ts";
 
 type RequireErrorMatcherOptions = readonly [
 	{

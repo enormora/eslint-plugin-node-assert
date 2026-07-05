@@ -6,13 +6,13 @@ default:
 compile:
 	tsc --build
 
-lint:
+lint: compile
 	markdownlint "**/*.md"
 	eslint . --max-warnings 0
 	eslint-doc-generator --check
 
-test-unit: compile
-	mocha --enable-source-maps
+test-unit:
+	mocha
 
 update-eslint-docs: compile
 	eslint-doc-generator

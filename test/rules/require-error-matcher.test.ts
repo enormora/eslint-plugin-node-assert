@@ -1,5 +1,5 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
-import { requireErrorMatcherRule } from "../../source/rules/require-error-matcher.js";
+import { requireErrorMatcherRule } from "../../source/rules/require-error-matcher.ts";
 
 const ruleTester = new RuleTester();
 const requiredMessagePropertyDescription = String.raw`property "message"`;
