@@ -8,7 +8,7 @@ compile:
 
 lint: compile
 	markdownlint "**/*.md"
-	eslint . --max-warnings 0
+	eslint . --cache --cache-location "./target/eslintcache" --cache-strategy content --max-warnings 0
 	eslint-doc-generator --check
 
 test-unit:

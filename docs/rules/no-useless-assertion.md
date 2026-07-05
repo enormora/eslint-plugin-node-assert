@@ -38,7 +38,7 @@ Two-input methods:
 The following patterns are considered warnings:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.ok(true);
 assert(false);
@@ -46,13 +46,13 @@ assert.ifError(undefined);
 assert.strictEqual(1, 1);
 assert.notStrictEqual(1, 2);
 assert.deepStrictEqual({}, {});
-assert.match("alphabet", /pha/);
+assert.match('alphabet', /pha/);
 ```
 
 These patterns would not be considered warnings:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.ok(value);
 assert(value);
@@ -69,11 +69,11 @@ The rule uses Node's actual assert semantics when deciding whether a constant as
 That matters for legacy methods such as `equal`, `notEqual`, and `deepEqual`:
 
 ```js
-import assert from "node:assert";
-assert.equal(1, "1"); // reported as always-passes
+import assert from 'node:assert';
+assert.equal(1, '1'); // reported as always-passes
 
-import strictAssert from "node:assert/strict";
-strictAssert.equal(1, "1"); // reported as always-fails
+import strictAssert from 'node:assert/strict';
+strictAssert.equal(1, '1'); // reported as always-fails
 ```
 
 ### Limitations

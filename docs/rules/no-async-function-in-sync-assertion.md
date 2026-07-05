@@ -11,7 +11,7 @@
 Examples of **incorrect** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.throws(async () => {
     await doThing();
@@ -25,7 +25,7 @@ assert.doesNotThrow(async function () {
 Examples of **correct** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 await assert.rejects(async () => {
     await doThing();

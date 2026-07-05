@@ -11,27 +11,27 @@ Node's `assert.throws()`, `assert.doesNotThrow()`, `assert.rejects()`, and `asse
 Examples of **incorrect** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.throws(fn, (error) => {
-    assert.strictEqual(error.message, "invalid input");
+    assert.strictEqual(error.message, 'invalid input');
 });
 
-await assert.rejects(promise, (error) => assert.strictEqual(error.message, "invalid input"));
+await assert.rejects(promise, (error) => assert.strictEqual(error.message, 'invalid input'));
 ```
 
 Examples of **correct** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.throws(fn, (error) => {
-    assert.strictEqual(error.message, "invalid input");
+    assert.strictEqual(error.message, 'invalid input');
     return true;
 });
 
 await assert.rejects(promise, (error) => {
-    assert.strictEqual(error.message, "invalid input");
+    assert.strictEqual(error.message, 'invalid input');
     return true;
 });
 ```

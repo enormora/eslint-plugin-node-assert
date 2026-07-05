@@ -1,5 +1,5 @@
-import * as mocha from "mocha";
-import { RuleTester } from "@typescript-eslint/rule-tester";
+import * as mocha from 'mocha';
+import { RuleTester } from '@typescript-eslint/rule-tester';
 
 RuleTester.afterAll = mocha.after;
 RuleTester.describe = mocha.suite;

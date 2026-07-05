@@ -18,10 +18,10 @@ This rule reports `assert.strictEqual` and `assert.equal` calls where at least o
 Examples of **incorrect** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.strictEqual(result, { ok: true });
-assert.strictEqual(result, [1, 2, 3]);
+assert.strictEqual(result, [ 1, 2, 3 ]);
 assert.equal(result, { ok: true });
 assert.strictEqual({ ok: true }, result);
 ```
@@ -29,13 +29,13 @@ assert.strictEqual({ ok: true }, result);
 Examples of **correct** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.deepStrictEqual(result, { ok: true });
-assert.deepStrictEqual(result, [1, 2, 3]);
+assert.deepStrictEqual(result, [ 1, 2, 3 ]);
 assert.deepEqual(result, { ok: true });
 assert.strictEqual(result, 42);
-assert.strictEqual(result, "hello");
+assert.strictEqual(result, 'hello');
 assert.strictEqual(result, null);
 ```
 
@@ -47,7 +47,7 @@ A call is reported when:
 - The call has at least two arguments and neither of the first two is a `SpreadElement`.
 - At least one of the first two arguments is an `ObjectExpression` (`{ ... }`) or `ArrayExpression` (`[ ... ]`).
 
-The rule deliberately limits detection to literal forms because, without type information, an arbitrary expression cannot be classified as an object reference. If you compare a value that is *known* to be an object but not written as a literal (for example, a result returned from a factory), the rule will not flag it. Use `deepStrictEqual` or `deepEqual` whenever in doubt.
+The rule deliberately limits detection to literal forms because, without type information, an arbitrary expression cannot be classified as an object reference. If you compare a value that is _known_ to be an object but not written as a literal (for example, a result returned from a factory), the rule will not flag it. Use `deepStrictEqual` or `deepEqual` whenever in doubt.
 
 ### Autofix
 
@@ -57,7 +57,7 @@ The autofix is applied for the common shapes of the callee:
 
 - `assert.strictEqual(...)` (member access via identifier)
 - `assert['strictEqual'](...)` (computed access with a string literal)
-- `` assert[`strictEqual`](...) `` (computed access with a constant template literal)
+- ``assert[`strictEqual`](...)`` (computed access with a constant template literal)
 
 Identifier callees (e.g. a named import like `import { strictEqual } from 'node:assert'; strictEqual(actual, {})`) are reported but not autofixed, because rewriting the call site would also require changing the import. Computed access via a `const`-bound key (`const k = 'strictEqual'; assert[k](...)`) is reported but not autofixed for the same reason.
 

@@ -13,7 +13,7 @@ This rule prefers `assert.match()` and `assert.doesNotMatch()` over wrapping `Re
 Examples of **incorrect** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.ok(/foo/.test(value));
 assert.strictEqual(pattern.test(value), false);
@@ -22,7 +22,7 @@ assert.strictEqual(pattern.test(value), false);
 Examples of **correct** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.match(value, /foo/);
 assert.doesNotMatch(value, pattern);

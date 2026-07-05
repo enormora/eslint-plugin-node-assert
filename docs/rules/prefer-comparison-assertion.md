@@ -13,7 +13,7 @@ This rule prefers `assert.equal()`, `assert.notEqual()`, `assert.strictEqual()`,
 Examples of **incorrect** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.ok(actual === expected);
 assert(actual !== expected);
@@ -23,7 +23,7 @@ assert.equal(result.deep.value === 42, true);
 Examples of **correct** code for this rule:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.strictEqual(actual, expected);
 assert.notStrictEqual(actual, expected);

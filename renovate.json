@@ -1,25 +1,25 @@
 {
-	"extends": ["config:base"],
-	"labels": ["renovate", "upgrade"],
-	"dependencyDashboard": false,
-	"lockFileMaintenance": {
-		"enabled": true,
-		"automerge": true
-	},
-	"nvm": {
-		"enabled": false
-	},
-	"packageRules": [
-		{
-			"matchPackagePatterns": ["^@enormora/eslint-config"],
-			"groupName": "@enormora/eslint-config",
-			"groupSlug": "enormora-eslint-config"
-		},
-		{
-			"matchDepTypes": ["dependencies", "devDependencies"],
-			"matchUpdateTypes": ["minor", "patch"],
-			"automerge": true,
-			"automergeType": "pr"
-		}
-	]
+    "extends": ["config:base"],
+    "labels": ["renovate", "upgrade"],
+    "dependencyDashboard": false,
+    "lockFileMaintenance": {
+        "enabled": true,
+        "automerge": true
+    },
+    "nvm": {
+        "enabled": false
+    },
+    "packageRules": [
+        {
+            "matchPackagePatterns": ["^@enormora/eslint-config"],
+            "groupName": "@enormora/eslint-config",
+            "groupSlug": "enormora-eslint-config"
+        },
+        {
+            "matchDepTypes": ["dependencies", "devDependencies"],
+            "matchUpdateTypes": ["minor", "patch"],
+            "automerge": true,
+            "automergeType": "pr"
+        }
+    ]
 }

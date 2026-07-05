@@ -1,9 +1,9 @@
 {
-	"extends": "../tsconfig.base.json",
-	"compilerOptions": {
-		"tsBuildInfoFile": "../target/buildcache/source.tsbuildinfo",
-		"outDir": "../target/build/source",
-		"rootDir": "."
-	},
-	"include": ["./**/*.ts"]
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "../target/buildcache/source.tsbuildinfo",
+        "outDir": "../target/build/source",
+        "rootDir": "."
+    },
+    "include": ["./**/*.ts"]
 }

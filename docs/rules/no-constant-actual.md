@@ -35,26 +35,26 @@ Single-argument methods (`actual`):
 The following patterns are considered warnings:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.strictEqual(42, actual);
 assert.deepStrictEqual({ ok: true }, result);
 assert.notStrictEqual(null, value);
-assert.equal("foo", result);
-assert.throws({ message: "boom" }, fn);
+assert.equal('foo', result);
+assert.throws({ message: 'boom' }, fn);
 assert.match(/pattern/, value);
-assert.ifError("not an error");
+assert.ifError('not an error');
 ```
 
 These patterns would not be considered warnings:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.strictEqual(actual, 42);
 assert.deepStrictEqual(result, { ok: true });
 assert.notStrictEqual(value, null);
-assert.throws(fn, { message: "boom" });
+assert.throws(fn, { message: 'boom' });
 assert.match(value, /pattern/);
 assert.ifError(err);
 ```
@@ -71,7 +71,7 @@ The rule resolves common indirections on top of plain `assert.method(...)` calls
 
 - Imports from `node:assert`, `node:assert/strict`, `assert`, and `assert/strict`.
 - Aliased named imports (`import { strictEqual as foo } from 'node:assert/strict'; foo(...)`).
-- Computed member access with a string literal (`assert['strictEqual'](...)`), a constant template literal (`` assert[`strictEqual`](...) ``), or a `const`-declared string (`const key = 'strictEqual'; assert[key](...)`).
+- Computed member access with a string literal (`assert['strictEqual'](...)`), a constant template literal (``assert[`strictEqual`](...)``), or a `const`-declared string (`const key = 'strictEqual'; assert[key](...)`).
 - Aliasing the namespace (`const a = assert; a.strictEqual(...)`), including multi-hop chains (`const a = assert; const b = a; b.strictEqual(...)`).
 - Destructuring from the namespace (`const { strictEqual } = assert; strictEqual(...)`), including renames (`const { strictEqual: foo } = assert; foo(...)`).
 - Re-binding a named import (`const eq = strictEqual; eq(...)`).

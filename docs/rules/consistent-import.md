@@ -19,11 +19,11 @@ Examples for `style: "strict-module"`:
 Invalid:
 
 ```js
-import assert from "node:assert";
+import assert from 'node:assert';
 ```
 
 Valid:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 ```

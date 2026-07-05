@@ -1,10 +1,10 @@
 {
-	"extends": "../tsconfig.base.json",
-	"compilerOptions": {
-		"tsBuildInfoFile": "../target/buildcache/test.tsbuildinfo",
-		"outDir": "../target/build/test",
-		"rootDir": "."
-	},
-	"references": [{ "path": "../source/" }],
-	"include": ["./**/*.test.ts", "./helpers/**/*.ts"]
+    "extends": "../tsconfig.base.json",
+    "compilerOptions": {
+        "tsBuildInfoFile": "../target/buildcache/test.tsbuildinfo",
+        "outDir": "../target/build/test",
+        "rootDir": "."
+    },
+    "references": [{ "path": "../source/" }],
+    "include": ["./**/*.test.ts", "./helpers/**/*.ts"]
 }

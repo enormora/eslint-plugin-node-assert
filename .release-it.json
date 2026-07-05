@@ -1,15 +1,15 @@
 {
-	"git": {
-		"changelog": "npx pr-log --stdout --unreleased"
-	},
-	"npm": {
-		"publish": true
-	},
-	"github": {
-		"release": true,
-		"releaseName": "${version}"
-	},
-	"hooks": {
-		"after:bump": ["npx pr-log ${version} --sloppy"]
-	}
+    "git": {
+        "changelog": "npx pr-log --stdout --unreleased"
+    },
+    "npm": {
+        "publish": true
+    },
+    "github": {
+        "release": true,
+        "releaseName": "${version}"
+    },
+    "hooks": {
+        "after:bump": ["npx pr-log ${version} --sloppy"]
+    }
 }

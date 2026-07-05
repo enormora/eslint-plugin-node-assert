@@ -41,7 +41,7 @@ Configure the assertion method names to restrict:
 Examples of **incorrect** code with that configuration:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 assert.doesNotReject(promiseUnderTest);
 assert.doesNotThrow(() => runOperation());
@@ -52,7 +52,7 @@ assert.deepEqual(actualValue, expectedValue);
 Examples of **correct** code with that configuration:
 
 ```js
-import assert from "node:assert/strict";
+import assert from 'node:assert/strict';
 
 await promiseUnderTest;
 runOperation();
@@ -66,10 +66,10 @@ The rule takes one object option:
 
 ```ts
 type Options = {
-  assertions: Array<{
-    name: string;
-    message?: string;
-  }>;
+    assertions: Array<{
+        name: string;
+        message?: string;
+    }>;
 };
 ```
 
