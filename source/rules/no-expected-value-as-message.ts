@@ -1,12 +1,9 @@
-import { AST_NODE_TYPES, ESLintUtils, type TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { isConstant } from '../ast/is-constant.ts';
 import { isConstantString } from '../ast/is-constant-string.ts';
 import { createAssertBindingTracker, NOT_ASSERT_MODULE } from '../node-assert/method-tracker.ts';
 import { isAssertModuleSpecifier } from '../node-assert/modules.ts';
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
+import { createRule } from './create-rule.ts';
 
 const OK_STYLE_METHODS: ReadonlySet<string> = new Set([ 'ok' ]);
 const ERROR_MATCHER_METHODS: ReadonlySet<string> = new Set([ 'throws', 'doesNotThrow', 'rejects', 'doesNotReject' ]);

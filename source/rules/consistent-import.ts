@@ -1,9 +1,6 @@
 /* eslint-disable complexity -- this rule performs explicit style branching for readability */
-import { AST_NODE_TYPES, ESLintUtils, type TSESTree } from '@typescript-eslint/utils';
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
+import { createRule } from './create-rule.ts';
 
 type ConsistentImportStyle = 'base' | 'strict-export' | 'strict-module';
 type ConsistentImportOptions = readonly [

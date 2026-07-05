@@ -1,6 +1,7 @@
-import { ESLintUtils, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESTree } from '@typescript-eslint/utils';
 import { createAssertBindingTracker, NOT_ASSERT_MODULE } from '../node-assert/method-tracker.ts';
 import { isAssertModuleSpecifier } from '../node-assert/modules.ts';
+import { createRule } from './create-rule.ts';
 
 type RestrictedAssertion = {
     readonly name: string;
@@ -12,10 +13,6 @@ type NoRestrictedAssertionOptions = readonly [
         readonly assertions: readonly RestrictedAssertion[];
     }
 ];
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
 
 function resolveStrictReExport(propertyName: string): null | undefined {
     return propertyName === 'strict' ? null : undefined;

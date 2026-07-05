@@ -1,4 +1,4 @@
-import { ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
 import type { JSONSchema4 } from '@typescript-eslint/utils/json-schema';
 import { isConstantString } from '../ast/is-constant-string.ts';
 import {
@@ -7,6 +7,7 @@ import {
     type AssertBindingTracker
 } from '../node-assert/method-tracker.ts';
 import { isAssertModuleSpecifier } from '../node-assert/modules.ts';
+import { createRule } from './create-rule.ts';
 import {
     collectObjectPropertyNames,
     defaultAllowedMatchers,
@@ -31,10 +32,6 @@ type RequireErrorMatcherOptions = readonly [
         };
     }
 ];
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
 
 const ruleMessages = {
     'disallowed-error-matcher-kind': 'This project requires {{allowedMatcherDescription}} in `assert.{{methodName}}()`',

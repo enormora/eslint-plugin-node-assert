@@ -1,13 +1,10 @@
-import { AST_NODE_TYPES, ESLintUtils, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
+import { AST_NODE_TYPES, type TSESLint, type TSESTree } from '@typescript-eslint/utils';
 import {
     createAssertBindingTracker,
     NOT_ASSERT_MODULE,
     type ResolvedMethodCall
 } from '../node-assert/method-tracker.ts';
-
-const createRule = ESLintUtils.RuleCreator(function (name) {
-    return `https://github.com/screendriver/eslint-plugin-node-assert/blob/master/docs/rules/${name}.md`;
-});
+import { createRule } from './create-rule.ts';
 
 const booleanAssertionMethodNames: ReadonlySet<string> = new Set([
     'ok',
