@@ -1,6 +1,6 @@
 import { baseConfig } from '@enormora/eslint-config-base';
+import { mochaNodeAssertConfig } from '@enormora/eslint-config-mocha-node-assert';
 import { nodeConfig } from '@enormora/eslint-config-node';
-import { mochaConfig } from '@enormora/eslint-config-mocha';
 import { typescriptConfig } from '@enormora/eslint-config-typescript';
 
 const codeFilePatterns = [ '**/*.{js,ts}' ];
@@ -23,7 +23,7 @@ export default [
         }
     },
     {
-        ...mochaConfig,
+        ...mochaNodeAssertConfig,
         files: [ 'test/**/*.test.ts' ]
     },
     {
