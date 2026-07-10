@@ -1,4 +1,4 @@
-import * as assert from 'node:assert/strict';
+import assert from 'node:assert';
 import { suite, test } from 'mocha';
 import plugin from '../../source/all-rules.ts';
 

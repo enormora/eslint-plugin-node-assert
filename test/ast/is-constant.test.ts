@@ -1,4 +1,4 @@
-import * as assert from 'node:assert/strict';
+import assert from 'node:assert';
 import { suite, test } from 'mocha';
 import type { Rule } from 'eslint';
 import type { TSESTree } from '@typescript-eslint/utils';

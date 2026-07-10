@@ -1,4 +1,4 @@
-import * as assert from 'node:assert/strict';
+import assert from 'node:assert';
 import { suite, test } from 'mocha';
 import type { Rule } from 'eslint';
 import type { TSESLint, TSESTree } from '@typescript-eslint/utils';
@@ -88,9 +88,18 @@ suite('createAssertBindingTracker()', function () {
             if (firstCall === undefined) {
                 throw new Error('expected the call to be resolved');
             }
-            assert.strictEqual(firstCall.bindingKind, 'member-expression');
-            assert.strictEqual(calls.length, 1);
-            assert.strictEqual(firstCall.resolvedMethod, 'strictEqual');
+            assert.deepStrictEqual(
+                {
+                    callCount: calls.length,
+                    bindingKind: firstCall.bindingKind,
+                    resolvedMethod: firstCall.resolvedMethod
+                },
+                {
+                    callCount: 1,
+                    bindingKind: 'member-expression',
+                    resolvedMethod: 'strictEqual'
+                }
+            );
         });
 
         test('resolves member calls on a namespace import', function () {
@@ -113,8 +122,10 @@ suite('createAssertBindingTracker()', function () {
             if (firstCall === undefined) {
                 throw new Error('expected the call to be resolved');
             }
-            assert.strictEqual(firstCall.bindingKind, 'method-binding');
-            assert.strictEqual(firstCall.resolvedMethod, 'strictEqual');
+            assert.partialDeepStrictEqual(firstCall, {
+                bindingKind: 'method-binding',
+                resolvedMethod: 'strictEqual'
+            });
         });
 
         test('resolves aliased named imports', function () {
@@ -263,8 +274,10 @@ suite('createAssertBindingTracker()', function () {
             if (firstCall === undefined) {
                 throw new Error('expected the call to be resolved');
             }
-            assert.strictEqual(firstCall.resolvedMethod, 'strictEqual');
-            assert.strictEqual(firstCall.meta, true);
+            assert.partialDeepStrictEqual(firstCall, {
+                resolvedMethod: 'strictEqual',
+                meta: true
+            });
         });
 
         test('registers a re-exported namespace through const destructuring', function () {
@@ -303,8 +316,10 @@ suite('createAssertBindingTracker()', function () {
             if (firstCall === undefined) {
                 throw new Error('expected the call to be resolved');
             }
-            assert.strictEqual(firstCall.bindingKind, 'namespace-callable');
-            assert.strictEqual(firstCall.resolvedMethod, 'strictEqual');
+            assert.partialDeepStrictEqual(firstCall, {
+                bindingKind: 'namespace-callable',
+                resolvedMethod: 'strictEqual'
+            });
         });
 
         test('treats a direct namespace-import call as the configured method', function () {
@@ -349,8 +364,10 @@ suite('createAssertBindingTracker()', function () {
             if (firstCall === undefined) {
                 throw new Error('expected the call to be resolved');
             }
-            assert.strictEqual(firstCall.resolvedMethod, 'strictEqual');
-            assert.strictEqual(firstCall.meta, true);
+            assert.partialDeepStrictEqual(firstCall, {
+                resolvedMethod: 'strictEqual',
+                meta: true
+            });
         });
 
         test('prefers a destructured method binding over the callable namespace shortcut', function () {
