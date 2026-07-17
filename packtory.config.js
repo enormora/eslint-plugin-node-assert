@@ -80,7 +80,8 @@ export async function buildConfig() {
                 description: packageJson.description,
                 keywords: packageJson.keywords,
                 license: packageJson.license,
-                repository: packageJson.repository
+                repository: packageJson.repository,
+                engines: packageJson.engines
             },
             additionalFiles: [
                 {
