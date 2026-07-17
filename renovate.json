@@ -1,6 +1,11 @@
 {
-    "extends": ["config:base"],
-    "labels": ["renovate", "upgrade"],
+    "extends": [
+        "config:base"
+    ],
+    "labels": [
+        "renovate",
+        "upgrade"
+    ],
     "dependencyDashboard": false,
     "lockFileMaintenance": {
         "enabled": true,
@@ -11,20 +16,32 @@
     },
     "packageRules": [
         {
-            "matchPackagePatterns": ["^@enormora/eslint-config"],
+            "matchPackagePatterns": [
+                "^@enormora/eslint-config"
+            ],
             "groupName": "@enormora/eslint-config",
             "groupSlug": "enormora-eslint-config"
         },
         {
-            "matchPackagePatterns": ["^@packtory/"],
+            "matchPackagePatterns": [
+                "^@packtory/"
+            ],
             "groupName": "@packtory dependencies",
             "groupSlug": "packtory"
         },
         {
-            "matchDepTypes": ["dependencies", "devDependencies"],
-            "matchUpdateTypes": ["minor", "patch"],
+            "matchDepTypes": [
+                "dependencies",
+                "devDependencies"
+            ],
+            "matchUpdateTypes": [
+                "minor",
+                "patch"
+            ],
             "automerge": true,
             "automergeType": "pr"
         }
-    ]
+    ],
+    "platformAutomerge": true,
+    "automergeStrategy": "merge-commit"
 }
