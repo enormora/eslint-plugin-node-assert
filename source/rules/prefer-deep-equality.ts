@@ -76,16 +76,18 @@ function buildFix(callee: Readonly<TSESTree.Expression>, deepMethodName: string)
 export const preferDeepEqualityRule = createRule({
     name: 'prefer-deep-equality',
     meta: {
+        type: 'problem',
         docs: {
-            description: 'Prefer deep equality assertions when comparing object or array literals'
+            description: 'Prefer deep equality assertions when comparing object or array literals',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/prefer-deep-equality.md'
         },
+        fixable: 'code',
+        schema: [],
         messages: {
             'prefer-deep-equality':
                 "Use '{{deepMethodName}}' instead of '{{shallowMethodName}}' when comparing object or array literals"
-        },
-        type: 'problem',
-        fixable: 'code',
-        schema: []
+        }
     },
     defaultOptions: [],
     create(context) {

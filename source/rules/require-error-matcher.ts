@@ -75,6 +75,7 @@ const ruleSchema: JSONSchema4[] = [
         properties: {
             allowedMatchers: {
                 type: 'array',
+                description: 'The matcher kinds that satisfy the rule',
                 items: {
                     type: 'string',
                     enum: [ 'object', 'constructor', 'validation-function', 'regex' ]
@@ -84,15 +85,18 @@ const ruleSchema: JSONSchema4[] = [
             },
             objectMatcher: {
                 type: 'object',
+                description: 'Additional requirements for object matchers',
                 properties: {
                     requiredProperties: {
                         type: 'array',
+                        description: 'Properties an object matcher must always include',
                         items: { type: 'string' },
                         minItems: 1,
                         uniqueItems: true
                     },
                     requireAtLeastOneProperty: {
                         type: 'array',
+                        description: 'Properties of which an object matcher must include at least one',
                         items: { type: 'string' },
                         minItems: 1,
                         uniqueItems: true
@@ -253,15 +257,16 @@ function checkObjectMatcherRequirements(
 export const requireErrorMatcherRule = createRule<RequireErrorMatcherOptions, RuleMessageId>({
     name: 'require-error-matcher',
     meta: {
-        docs: {
-            description: 'Require assert.throws() and assert.rejects() to include an error matcher'
-        },
-        messages: ruleMessages,
         type: 'problem',
-        schema: ruleSchema
+        docs: {
+            description: 'Require assert.throws() and assert.rejects() to include an error matcher',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/require-error-matcher.md'
+        },
+        schema: ruleSchema,
+        defaultOptions: [ {} ],
+        messages: ruleMessages
     },
-    defaultOptions: [ {} ],
-
     create(context, options) {
         const tracker = createAssertBindingTracker<null>({
             isAssertMethod: isTrackedAssertionMethodName,

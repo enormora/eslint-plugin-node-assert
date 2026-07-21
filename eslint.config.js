@@ -1,9 +1,15 @@
 import { baseConfig } from '@enormora/eslint-config-base';
+import { createEslintPluginConfig } from '@enormora/eslint-config-eslint-plugin';
 import { mochaNodeAssertConfig } from '@enormora/eslint-config-mocha-node-assert';
 import { nodeConfig } from '@enormora/eslint-config-node';
 import { typescriptConfig } from '@enormora/eslint-config-typescript';
 
 const codeFilePatterns = [ '**/*.{js,ts}' ];
+
+const eslintPluginConfig = createEslintPluginConfig({
+    docsUrlPattern: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/{{name}}.md',
+    descriptionPattern: '^(Enforce|Require|Disallow|Prefer)'
+});
 
 export default [
     {
@@ -21,6 +27,17 @@ export default [
     {
         ...mochaNodeAssertConfig,
         files: [ 'test/**/*.test.ts' ]
+    },
+    {
+        ...eslintPluginConfig,
+        files: [ 'source/rules/**/*.ts' ],
+        rules: {
+            ...eslintPluginConfig.rules,
+            // Blocked by @typescript-eslint/utils: RuleCreator's RuleMetaData does not type `meta.languages`
+            // (still missing as of 8.65.0, pinned here at 8.62.1), so setting it is a type error. ESLint core
+            // added the property in https://github.com/eslint/eslint/pull/20571; re-enable once the type ships.
+            'eslint-plugin/require-meta-languages': 'off'
+        }
     },
     {
         files: [ 'eslint.config.js', 'source/all-rules.ts' ],

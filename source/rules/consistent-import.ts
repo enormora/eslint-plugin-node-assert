@@ -32,28 +32,30 @@ function isStrictModuleSpecifier(moduleSpecifier: unknown): moduleSpecifier is s
 export const consistentImportRule = createRule<ConsistentImportOptions, 'consistent-import'>({
     name: 'consistent-import',
     meta: {
-        docs: {
-            description: 'Enforce a consistent Node.js assert import style'
-        },
-        messages: {
-            'consistent-import': 'Use the configured assert import style'
-        },
         type: 'suggestion',
+        docs: {
+            description: 'Enforce a consistent Node.js assert import style',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/consistent-import.md'
+        },
         schema: [
             {
                 type: 'object',
                 properties: {
                     style: {
                         type: 'string',
-                        enum: [ 'base', 'strict-module', 'strict-export' ]
+                        enum: [ 'base', 'strict-module', 'strict-export' ],
+                        description: 'Which assert import style to enforce'
                     }
                 },
                 additionalProperties: false
             }
-        ]
+        ],
+        defaultOptions: [ { style: 'strict-module' } ],
+        messages: {
+            'consistent-import': 'Use the configured assert import style'
+        }
     },
-    defaultOptions: [ { style: 'strict-module' } ],
-
     create(context, options) {
         const configuredStyle = options[0].style ?? 'strict-module';
         function isInvalidImport(node: Readonly<TSESTree.ImportDeclaration>): boolean {

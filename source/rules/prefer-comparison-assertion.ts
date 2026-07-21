@@ -303,16 +303,18 @@ function buildFix(
 export const preferComparisonAssertionRule = createRule({
     name: 'prefer-comparison-assertion',
     meta: {
+        type: 'suggestion',
         docs: {
-            description: 'Prefer dedicated equality assertion methods over asserting comparison results'
+            description: 'Prefer dedicated equality assertion methods over asserting comparison results',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/prefer-comparison-assertion.md'
         },
+        fixable: 'code',
+        schema: [],
         messages: {
             'prefer-comparison-assertion':
                 "Use '{{replacementMethodName}}' instead of asserting the result of a comparison expression"
-        },
-        type: 'suggestion',
-        fixable: 'code',
-        schema: []
+        }
     },
     defaultOptions: [],
     create(context) {

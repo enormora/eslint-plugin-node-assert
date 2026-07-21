@@ -251,16 +251,18 @@ function buildReplacementFix(
 export const preferMatchRule = createRule({
     name: 'prefer-match',
     meta: {
+        type: 'suggestion',
         docs: {
-            description: 'Prefer assert.match() or assert.doesNotMatch() for regular expression assertions'
+            description: 'Prefer assert.match() or assert.doesNotMatch() for regular expression assertions',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/prefer-match.md'
         },
+        fixable: 'code',
+        schema: [],
         messages: {
             'prefer-match':
                 'Prefer assert.match() or assert.doesNotMatch() when asserting against a regular expression.'
-        },
-        type: 'suggestion',
-        fixable: 'code',
-        schema: []
+        }
     },
     defaultOptions: [],
     create(context) {

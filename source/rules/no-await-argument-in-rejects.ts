@@ -65,17 +65,19 @@ function reportAwaitedArgument(
 export const noAwaitArgumentInRejectsRule = createRule<readonly [], 'no-await-argument-in-rejects'>({
     name: 'no-await-argument-in-rejects',
     meta: {
+        type: 'problem',
         docs: {
-            description: 'Disallow awaiting the argument passed to assert.rejects() and assert.doesNotReject()'
+            description: 'Disallow awaiting the argument passed to assert.rejects() and assert.doesNotReject()',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/no-await-argument-in-rejects.md'
         },
+        fixable: 'code',
+        schema: [],
         messages: {
             'no-await-argument-in-rejects':
                 'Do not await the argument passed to assert.rejects() or assert.doesNotReject(). ' +
                 'Pass the promise itself, or pass a function that returns the promise.'
-        },
-        type: 'problem',
-        fixable: 'code',
-        schema: []
+        }
     },
     defaultOptions: [],
 
