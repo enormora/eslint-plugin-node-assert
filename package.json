@@ -36,7 +36,6 @@
         "@typescript-eslint/rule-tester": "8.62.1",
         "eslint": "10.6.0",
         "eslint-doc-generator": "3.6.0",
-        "markdownlint-cli": "0.49.0",
         "mocha": "11.7.6",
         "npm-run-all2": "9.0.2",
         "rust-just": "1.55.1",
