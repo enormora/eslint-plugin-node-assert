@@ -16,11 +16,7 @@ export default [
     },
     {
         ...typescriptConfig,
-        files: [ '**/*.ts' ],
-        rules: {
-            ...typescriptConfig.rules,
-            'import/extensions': 'off'
-        }
+        files: [ '**/*.ts' ]
     },
     {
         ...mochaNodeAssertConfig,
@@ -33,7 +29,7 @@ export default [
         }
     },
     {
-        files: [ 'source/rules/**/*.ts' ],
+        files: [ 'source/rules/create-rule.ts' ],
         rules: {
             'new-cap': 'off'
         }
