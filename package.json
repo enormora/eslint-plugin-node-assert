@@ -38,7 +38,7 @@
         "eslint": "10.6.0",
         "eslint-doc-generator": "3.6.0",
         "mocha": "11.7.6",
-        "rust-just": "1.55.1",
+        "rust-just": "1.57.0",
         "typescript": "6.0.3"
     },
     "peerDependencies": {
