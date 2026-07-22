@@ -103,7 +103,7 @@ export function collectObjectPropertyNames(
 export function formatAllowedMatcherKinds(allowedMatchers: ReadonlySet<MatcherKind>): string {
     const matcherDescriptions = Array.from(allowedMatchers, formatMatcherKind);
     const [ firstMatcherDescription ] = matcherDescriptions;
-    if (matcherDescriptions.length === singleMatcherCount && firstMatcherDescription !== undefined) {
+    if (firstMatcherDescription !== undefined && matcherDescriptions.length === singleMatcherCount) {
         return `${getIndefiniteArticle(firstMatcherDescription)} ${firstMatcherDescription}`;
     }
     if (matcherDescriptions.length === pairMatcherCount) {

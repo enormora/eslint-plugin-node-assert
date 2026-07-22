@@ -49,10 +49,12 @@ function resolveCallsIn<TMeta = null>(
             const tracker = createAssertBindingTracker<TMeta>({
                 isAssertMethod,
                 classifyModule,
-                ...probeOptions.resolveNamespaceProperty !== undefined &&
-                    { resolveNamespaceProperty: probeOptions.resolveNamespaceProperty },
-                ...probeOptions.namespaceCallableMethod !== undefined &&
-                    { namespaceCallableMethod: probeOptions.namespaceCallableMethod }
+                ...probeOptions.resolveNamespaceProperty === undefined
+                    ? {}
+                    : { resolveNamespaceProperty: probeOptions.resolveNamespaceProperty },
+                ...probeOptions.namespaceCallableMethod === undefined
+                    ? {}
+                    : { namespaceCallableMethod: probeOptions.namespaceCallableMethod }
             });
             return {
                 ImportDeclaration(node) {

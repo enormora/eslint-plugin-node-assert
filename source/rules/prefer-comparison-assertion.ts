@@ -250,7 +250,7 @@ function buildReplacementCalleeText(
     replacementMethodName: ReplacementMethodName,
     sourceCode: Readonly<TSESLint.SourceCode>
 ): string | null {
-    if (callee.type === AST_NODE_TYPES.Identifier && bindingKind === 'namespace-callable') {
+    if (bindingKind === 'namespace-callable' && callee.type === AST_NODE_TYPES.Identifier) {
         return `${callee.name}.${replacementMethodName}`;
     }
     return callee.type === AST_NODE_TYPES.MemberExpression

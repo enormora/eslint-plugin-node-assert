@@ -154,10 +154,10 @@ function evaluateIdentifierConstant(node: Readonly<TSESTree.Identifier>): Consta
         return undefined;
     }
     if (node.name === 'NaN') {
-        return NaN;
+        return Number.NaN;
     }
     if (node.name === 'Infinity') {
-        return Infinity;
+        return Number.POSITIVE_INFINITY;
     }
     return NOT_EVALUATABLE;
 }
