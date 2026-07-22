@@ -160,10 +160,10 @@ function evaluateTemplateLiteral(node: Readonly<TSESTree.TemplateLiteral>): Cons
 
 function evaluateIdentifier(node: Readonly<TSESTree.Identifier>): ConstantEvaluation {
     if (node.name === 'Infinity') {
-        return knownConstant(Infinity);
+        return knownConstant(Number.POSITIVE_INFINITY);
     }
     if (node.name === 'NaN') {
-        return knownConstant(NaN);
+        return knownConstant(Number.NaN);
     }
     return node.name === 'undefined' ? knownConstant(undefined) : unknownConstant();
 }
