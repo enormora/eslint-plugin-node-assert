@@ -1,5 +1,9 @@
 import { ESLintUtils } from '@typescript-eslint/utils';
 
-export const createRule = ESLintUtils.RuleCreator(function (ruleName) {
+type RuleDocs = {
+    readonly recommended: boolean;
+};
+
+export const createRule = ESLintUtils.RuleCreator<RuleDocs>(function (ruleName) {
     return `https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/${ruleName}.md`;
 });

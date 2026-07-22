@@ -29,10 +29,14 @@ function getSecondArgument(
 export const noExpectedValueAsMessageRule = createRule({
     name: 'no-expected-value-as-message',
     meta: {
+        type: 'problem',
         docs: {
             description:
-                'Disallow passing an expected value where a message or error matcher belongs in Node.js assert calls'
+                'Disallow passing an expected value where a message or error matcher belongs in Node.js assert calls',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/no-expected-value-as-message.md'
         },
+        schema: [],
         messages: {
             'expected-value-as-message':
                 'The second argument is the assertion message; this constant looks like an expected value. ' +
@@ -40,9 +44,7 @@ export const noExpectedValueAsMessageRule = createRule({
             'string-as-error-matcher':
                 'A string literal does not match the error; use a RegExp, Error class, object matcher, or ' +
                 'validation function (a custom failure message goes in the third argument)'
-        },
-        type: 'problem',
-        schema: []
+        }
     },
     defaultOptions: [],
 

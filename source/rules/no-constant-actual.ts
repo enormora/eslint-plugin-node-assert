@@ -80,19 +80,21 @@ function buildSwapFix(
 export const noConstantActualRule = createRule({
     name: 'no-constant-actual',
     meta: {
+        type: 'problem',
         docs: {
-            description: 'Disallow passing a constant value as the first argument to Node.js assert methods'
+            description: 'Disallow passing a constant value as the first argument to Node.js assert methods',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/no-constant-actual.md'
         },
+        fixable: 'code',
+        schema: [],
         messages: {
             'no-constant-actual':
                 'The first argument should be the actual value; move the constant to the second argument',
             'constant-comparison': 'Both arguments are constant; one of these should be the actual value being tested',
             'constant-actual':
                 'The actual value passed to this assertion is a constant; this assertion has no meaningful effect'
-        },
-        type: 'problem',
-        fixable: 'code',
-        schema: []
+        }
     },
     defaultOptions: [],
 

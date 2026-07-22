@@ -313,15 +313,17 @@ function assertionAlwaysPasses(assertionArguments: Readonly<ConstantExpressionAr
 export const noUselessAssertionRule = createRule({
     name: 'no-useless-assertion',
     meta: {
+        type: 'problem',
         docs: {
-            description: 'Disallow Node.js assertions whose outcome is fully determined by constant inputs'
+            description: 'Disallow Node.js assertions whose outcome is fully determined by constant inputs',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/no-useless-assertion.md'
         },
+        schema: [],
         messages: {
             'always-passes': 'This assertion always passes because every checked input is constant',
             'always-fails': 'This assertion always fails because every checked input is constant'
-        },
-        type: 'problem',
-        schema: []
+        }
     },
     defaultOptions: [],
 

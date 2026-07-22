@@ -49,14 +49,16 @@ function classifyMessageSlot(args: readonly TSESTree.CallExpressionArgument[], s
 export const requireCustomMessageRule = createRule({
     name: 'require-custom-message',
     meta: {
+        type: 'suggestion',
         docs: {
-            description: 'Require a custom failure message argument in Node.js assert calls'
+            description: 'Require a custom failure message argument in Node.js assert calls',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/require-custom-message.md'
         },
+        schema: [],
         messages: {
             'require-custom-message': "Provide a custom failure message as the last argument to '{{methodName}}'"
-        },
-        type: 'suggestion',
-        schema: []
+        }
     },
     defaultOptions: [],
 

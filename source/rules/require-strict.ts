@@ -85,13 +85,12 @@ function buildFix(callee: Readonly<TSESTree.Expression>, strictMethodName: strin
 export const requireStrictRule = createRule<RequireStrictOptions, 'require-strict'>({
     name: 'require-strict',
     meta: {
-        docs: {
-            description: 'Require strict assertion semantics for Node.js assert equality methods'
-        },
-        messages: {
-            'require-strict': "Use '{{strictMethodName}}' instead of '{{legacyMethodName}}'"
-        },
         type: 'suggestion',
+        docs: {
+            description: 'Require strict assertion semantics for Node.js assert equality methods',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/require-strict.md'
+        },
         fixable: 'code',
         schema: [
             {
@@ -99,14 +98,18 @@ export const requireStrictRule = createRule<RequireStrictOptions, 'require-stric
                 properties: {
                     mode: {
                         type: 'string',
-                        enum: [ 'semantic', 'explicit' ]
+                        enum: [ 'semantic', 'explicit' ],
+                        description: 'Whether to rewrite legacy methods or only flag explicit strict violations'
                     }
                 },
                 additionalProperties: false
             }
-        ]
+        ],
+        defaultOptions: [ { mode: 'semantic' } ],
+        messages: {
+            'require-strict': "Use '{{strictMethodName}}' instead of '{{legacyMethodName}}'"
+        }
     },
-    defaultOptions: [ { mode: 'semantic' } ],
     create(context, options) {
         const mode = options[0].mode ?? 'semantic';
         const tracker = createAssertBindingTracker<boolean>({

@@ -38,30 +38,31 @@ export const noRestrictedAssertionRule = createRule<
 >({
     name: 'no-restricted-assertion',
     meta: {
-        docs: {
-            description: 'Disallow configured Node.js assert methods'
-        },
-        messages: {
-            'custom-message': '{{customMessage}}',
-            'restricted-assertion': 'Use of assert.{{methodName}}() is restricted.'
-        },
         type: 'problem',
+        docs: {
+            description: 'Disallow configured Node.js assert methods',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/no-restricted-assertion.md'
+        },
         schema: [
             {
                 type: 'object',
                 properties: {
                     assertions: {
                         type: 'array',
+                        description: 'The assert methods to disallow',
                         items: {
                             type: 'object',
                             properties: {
                                 name: {
                                     type: 'string',
-                                    minLength: 1
+                                    minLength: 1,
+                                    description: 'The name of the assert method to disallow'
                                 },
                                 message: {
                                     type: 'string',
-                                    minLength: 1
+                                    minLength: 1,
+                                    description: 'A custom message to report instead of the default one'
                                 }
                             },
                             required: [ 'name' ],
@@ -73,9 +74,13 @@ export const noRestrictedAssertionRule = createRule<
                 required: [ 'assertions' ],
                 additionalProperties: false
             }
-        ]
+        ],
+        defaultOptions: [ { assertions: [] } ],
+        messages: {
+            'custom-message': '{{customMessage}}',
+            'restricted-assertion': 'Use of assert.{{methodName}}() is restricted.'
+        }
     },
-    defaultOptions: [ { assertions: [] } ],
     create(context, ruleOptions) {
         const restrictedAssertionByName = createRestrictedAssertionByName(ruleOptions[0].assertions);
         const tracker = createAssertBindingTracker<null>({

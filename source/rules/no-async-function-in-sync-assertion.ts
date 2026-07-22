@@ -238,15 +238,17 @@ function checkSyncAssertionCall(
 export const noAsyncFunctionInSyncAssertionRule = createRule({
     name: 'no-async-function-in-sync-assertion',
     meta: {
+        type: 'problem',
         docs: {
-            description: 'Disallow passing async functions to synchronous Node.js assert methods'
+            description: 'Disallow passing async functions to synchronous Node.js assert methods',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/no-async-function-in-sync-assertion.md'
         },
+        schema: [],
         messages: {
             'no-async-function-in-sync-assertion':
                 '`assert.{{methodName}}()` does not await async functions. Use `assert.{{asyncMethodName}}()` instead'
-        },
-        type: 'problem',
-        schema: []
+        }
     },
     defaultOptions: [],
 

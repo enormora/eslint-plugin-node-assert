@@ -375,15 +375,17 @@ function isInvalidValidatorAnalysis(analysis: Readonly<FlowAnalysis>): boolean {
 export const requireValidErrorValidatorReturnRule = createRule({
     name: 'require-valid-error-validator-return',
     meta: {
+        type: 'problem',
         docs: {
-            description: 'Require custom Node.js assert error validators to return true when their checks pass'
+            description: 'Require custom Node.js assert error validators to return true when their checks pass',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/require-valid-error-validator-return.md'
         },
+        schema: [],
         messages: {
             'require-valid-error-validator-return':
                 "Error validator functions passed to '{{methodName}}' must return true when validation succeeds"
-        },
-        type: 'problem',
-        schema: []
+        }
     },
     defaultOptions: [],
     create(context) {

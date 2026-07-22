@@ -102,18 +102,20 @@ function groupConsecutiveCandidates(
 export const preferPartialDeepStrictEqualRule = createRule({
     name: 'prefer-partial-deep-strict-equal',
     meta: {
+        type: 'suggestion',
         docs: {
             description:
                 // eslint-disable-next-line @stylistic/max-len -- the description renders as a single sentence in the generated rules table
-                'Prefer a single `partialDeepStrictEqual` over multiple consecutive equality assertions on properties of the same object'
+                'Prefer a single `partialDeepStrictEqual` over multiple consecutive equality assertions on properties of the same object',
+            recommended: false,
+            url: 'https://github.com/enormora/eslint-plugin-node-assert/blob/main/docs/rules/prefer-partial-deep-strict-equal.md'
         },
+        schema: [],
         messages: {
             'prefer-partial-deep-strict-equal':
                 "Multiple consecutive equality assertions on properties of '{{rootName}}' can be combined " +
                 "into a single 'partialDeepStrictEqual' call"
-        },
-        type: 'suggestion',
-        schema: []
+        }
     },
     defaultOptions: [],
 
