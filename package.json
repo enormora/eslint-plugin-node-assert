@@ -37,7 +37,7 @@
         "@typescript-eslint/rule-tester": "8.65.0",
         "eslint": "10.8.0",
         "eslint-doc-generator": "3.7.0",
-        "mocha": "11.7.6",
+        "mocha": "11.8.0",
         "rust-just": "1.57.0",
         "typescript": "6.0.3"
     },
