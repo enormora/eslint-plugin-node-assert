@@ -23,7 +23,7 @@
         "node": ">=26.0.0"
     },
     "dependencies": {
-        "@typescript-eslint/utils": "8.69.0"
+        "@typescript-eslint/utils": "8.70.0"
     },
     "devDependencies": {
         "@enormora/eslint-config-base": "0.0.65",
@@ -34,7 +34,7 @@
         "@packtory/cli": "0.0.109",
         "@types/mocha": "10.0.10",
         "@types/node": "24.13.4",
-        "@typescript-eslint/rule-tester": "8.69.0",
+        "@typescript-eslint/rule-tester": "8.70.0",
         "eslint": "10.10.0",
         "eslint-doc-generator": "3.7.1",
         "mocha": "11.8.0",
