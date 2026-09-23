@@ -1,3 +1,21 @@
+## @enormora/eslint-plugin-node-assert 0.0.2 (September 23, 2026)
+
+### Documentation
+
+* Fix package and rule documentation URLs ([#634](https://github.com/enormora/eslint-plugin-node-assert/pull/634))
+* Fix npm badge package scope ([#633](https://github.com/enormora/eslint-plugin-node-assert/pull/633))
+
+### Dependency Upgrades
+
+* Update Linting-related dependencies ([#650](https://github.com/enormora/eslint-plugin-node-assert/pull/650))
+* Update @typescript-eslint/utils to 8.70.0
+
+### Build-Related
+
+* Migrate release automation to Packtory release pull requests ([#734](https://github.com/enormora/eslint-plugin-node-assert/pull/734))
+* Enable `@enormora/eslint-config-eslint-plugin` and drop obsolete lint tooling ([#652](https://github.com/enormora/eslint-plugin-node-assert/pull/652))
+* Use `@enormora/eslint-config-mocha-node-assert` ([#639](https://github.com/enormora/eslint-plugin-node-assert/pull/639))
+
 ## @enormora/eslint-plugin-node-assert 0.0.1 (July 5, 2026)
 
 ### Features
