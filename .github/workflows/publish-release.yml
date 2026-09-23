@@ -14,7 +14,8 @@ on:
 permissions: {}
 
 concurrency:
-    group: publish-release-${{ github.sha }}
+    group: publish-release
+    cancel-in-progress: false
 
 jobs:
     authorize-release-publish:
