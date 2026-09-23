@@ -13,7 +13,7 @@ const eslintPluginConfig = createEslintPluginConfig({
 
 export default [
     {
-        ignores: [ 'package-lock.json', 'target/**' ]
+        ignores: [ '**/CHANGELOG.md', 'package-lock.json', 'target/**' ]
     },
     ...baseConfig,
     {
