@@ -2,7 +2,8 @@ name: Check pull request labels
 
 on:
     pull_request:
-        types: [opened, labeled, unlabeled]
+        types: [opened, reopened, synchronize, labeled, unlabeled]
+    merge_group:
 
 permissions: {}
 
@@ -17,6 +18,7 @@ jobs:
         permissions:
             pull-requests: read # required to inspect labels on the pull request event payload
         if: >
+            github.event_name == 'pull_request' &&
             contains(github.event.pull_request.labels.*.name, 'breaking') == false &&
             contains(github.event.pull_request.labels.*.name, 'bug') == false &&
             contains(github.event.pull_request.labels.*.name, 'feature') == false &&
