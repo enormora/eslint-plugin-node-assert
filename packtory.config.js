@@ -86,11 +86,11 @@ export async function buildConfig() {
                     'Test (24.x)',
                     'Test (26.x)',
                     'Release PR policy',
-                    'Workflow Security Analysis',
-                ],
+                    'Workflow Security Analysis'
+                ]
             },
             label: 'release',
-            title: 'Prepare release',
+            title: 'Prepare release'
         },
         commonPackageSettings: {
             sourcesFolder,
