@@ -7,7 +7,8 @@ on:
     workflow_dispatch:
         inputs:
             release_pull_request_number:
-                required: false
+                description: Merged release pull request number to retry publishing
+                required: true
                 type: string
 
 permissions: {}
@@ -16,130 +17,28 @@ concurrency:
     group: publish-release-${{ github.sha }}
 
 jobs:
-    resolve-publish-target:
+    authorize-release-publish:
         runs-on: ubuntu-24.04
-        name: Resolve publish target
+        name: Authorize release publish
         permissions:
-            contents: read
-            pull-requests: read # Required to inspect pull requests associated with the pushed commit.
+            contents: read # required to check out the workflow source
+            pull-requests: read # required to validate release PR identity and files
         outputs:
-            should_publish: ${{ steps.resolve-publish-target.outputs.should_publish }}
-            publish_commit_sha: ${{ steps.resolve-publish-target.outputs.publish_commit_sha }}
-            release_pull_request_number: ${{ steps.resolve-publish-target.outputs.release_pull_request_number }}
-        env:
-            GH_TOKEN: ${{ github.token }}
-            GITHUB_TOKEN: ${{ github.token }}
-            RELEASE_PULL_REQUEST_NUMBER: ${{ inputs.release_pull_request_number }}
-        steps:
-            - name: Resolve publish target
-              id: resolve-publish-target
-              run: |
-                  set -euo pipefail
-
-                  if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
-                    if [ -z "${RELEASE_PULL_REQUEST_NUMBER}" ]; then
-                      echo 'release_pull_request_number is required for manual publishing.'
-                      exit 1
-                    fi
-
-                    if [ "${GITHUB_REF_NAME}" != 'main' ]; then
-                      echo 'Manual publishing must run from main.'
-                      exit 1
-                    fi
-
-                    release_pull_request=$(
-                      gh api "/repos/${GITHUB_REPOSITORY}/pulls/${RELEASE_PULL_REQUEST_NUMBER}"
-                    )
-
-                    is_release_pull_request=$(
-                      jq \
-                        --arg repository "${GITHUB_REPOSITORY}" \
-                        --raw-output \
-                        '(.merged == true) and
-                         (.merged_at != null) and
-                         (.head.ref == "release/eslint-plugin-node-assert") and
-                         (.head.repo.full_name == $repository) and
-                         (.base.ref == "main") and
-                         (.title == "Prepare release")' \
-                        <<< "${release_pull_request}"
-                    )
-
-                    if [ "${is_release_pull_request}" != 'true' ]; then
-                      echo 'The requested pull request is not a merged release pull request.'
-                      exit 1
-                    fi
-
-                    publish_commit_sha=$(jq -r '.merge_commit_sha // empty' <<< "${release_pull_request}")
-                    if [ -z "${publish_commit_sha}" ]; then
-                      echo 'The requested release pull request does not have a merge commit SHA.'
-                      exit 1
-                    fi
-
-                    echo 'should_publish=true' >> "${GITHUB_OUTPUT}"
-                    echo "publish_commit_sha=${publish_commit_sha}" >> "${GITHUB_OUTPUT}"
-                    echo "release_pull_request_number=${RELEASE_PULL_REQUEST_NUMBER}" >> "${GITHUB_OUTPUT}"
-                    exit 0
-                  fi
-
-                  associated_pull_requests=$(
-                    gh api \
-                      -H "Accept: application/vnd.github+json" \
-                      "/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/pulls"
-                  )
-
-                  matching_release_pull_requests=$(
-                    jq \
-                      --arg repository "${GITHUB_REPOSITORY}" \
-                      '[.[] |
-                        select(
-                          (.merged_at != null) and
-                          (.head.ref == "release/eslint-plugin-node-assert") and
-                          (.head.repo.full_name == $repository) and
-                          (.base.ref == "main") and
-                          (.title == "Prepare release")
-                        )
-                      ]' \
-                      <<< "${associated_pull_requests}"
-                  )
-
-                  matching_release_pull_request_count=$(jq 'length' <<< "${matching_release_pull_requests}")
-                  if [ "${matching_release_pull_request_count}" = '0' ]; then
-                    echo 'should_publish=false' >> "${GITHUB_OUTPUT}"
-                    exit 0
-                  fi
-
-                  if [ "${matching_release_pull_request_count}" != '1' ]; then
-                    echo 'More than one associated release pull request matched the pushed commit.'
-                    exit 1
-                  fi
-
-                  release_pull_request_number=$(jq -r '.[0].number' <<< "${matching_release_pull_requests}")
-                  echo 'should_publish=true' >> "${GITHUB_OUTPUT}"
-                  echo "publish_commit_sha=${GITHUB_SHA}" >> "${GITHUB_OUTPUT}"
-                  echo "release_pull_request_number=${release_pull_request_number}" >> "${GITHUB_OUTPUT}"
-
-    publish-release:
-        needs: resolve-publish-target
-        if: needs.resolve-publish-target.outputs.should_publish == 'true'
-        runs-on: ubuntu-24.04
-        name: Publish release
-        permissions:
-            contents: write # Required to push the package tag and create the GitHub Release.
-            id-token: write # Required by npm trusted publishing to mint the OIDC token.
-        env:
-            GH_TOKEN: ${{ github.token }}
-            GITHUB_TOKEN: ${{ github.token }}
+            should_publish: ${{ steps.authorize-publish.outputs.should_publish }}
+            publish_commit_sha: ${{ steps.authorize-publish.outputs.publish_commit_sha }}
+            release_commit_sha: ${{ steps.authorize-publish.outputs.release_commit_sha }}
+            release_pull_request_number: ${{ steps.authorize-publish.outputs.release_pull_request_number }}
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
-                  ref: ${{ needs.resolve-publish-target.outputs.publish_commit_sha }}
+                  ref: ${{ github.sha }}
                   fetch-depth: 0
-                  persist-credentials: true
+                  persist-credentials: false
             - name: Use Node.js
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
                   node-version: 26.x
-            - name: Install dependencies from the lockfile
+            - name: Install release workflow dependencies
               run: npm clean-install --ignore-scripts
             - name: Verify registry signatures for installed dependencies
               run: npm audit signatures
@@ -149,19 +48,74 @@ jobs:
                   spec="@packtory/cli@${version}"
                   attestation=$(npm view "${spec}" --json | jq -r '.dist.attestations // empty')
                   if [ -z "${attestation}" ]; then
+                    echo "::error::${spec} is missing a provenance attestation; refusing to authorize publishing"
+                    exit 1
+                  fi
+                  echo "Verified ${spec} has a registered provenance attestation."
+            - name: Authorize release publish
+              id: authorize-publish
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  RELEASE_PULL_REQUEST_NUMBER: ${{ inputs.release_pull_request_number || '' }}
+              run: |
+                  set -euo pipefail
+
+                  if [ "${GITHUB_EVENT_NAME}" = 'workflow_dispatch' ]; then
+                    if [ -z "${RELEASE_PULL_REQUEST_NUMBER}" ]; then
+                      echo 'release_pull_request_number is required for manual publishing.'
+                      exit 1
+                    fi
+
+                    npx just authorize-release-publish --release-pull-request "${RELEASE_PULL_REQUEST_NUMBER}"
+                  else
+                    npx just authorize-release-publish
+                  fi
+
+    publish-release:
+        needs: authorize-release-publish
+        if: needs.authorize-release-publish.outputs.should_publish == 'true'
+        runs-on: ubuntu-24.04
+        name: Publish release
+        permissions:
+            contents: write # required to create package tags and GitHub Releases
+            id-token: write # required by npm Trusted Publishing to mint the OIDC token
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  ref: ${{ needs.authorize-release-publish.outputs.publish_commit_sha }}
+                  fetch-depth: 0
+                  path: target/release-source
+                  persist-credentials: false
+            - name: Use Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: 26.x
+            - name: Install release dependencies
+              working-directory: target/release-source
+              run: npm clean-install --ignore-scripts
+            - name: Verify registry signatures for installed dependencies
+              working-directory: target/release-source
+              run: npm audit signatures
+            - name: Verify `@packtory/cli` ships with a provenance attestation
+              working-directory: target/release-source
+              run: |
+                  version=$(jq -r '.devDependencies["@packtory/cli"]' package.json)
+                  spec="@packtory/cli@${version}"
+                  attestation=$(npm view "${spec}" --json | jq -r '.dist.attestations // empty')
+                  if [ -z "${attestation}" ]; then
                     echo "::error::${spec} is missing a provenance attestation; refusing to publish"
                     exit 1
                   fi
                   echo "Verified ${spec} has a registered provenance attestation."
-            - name: Configure tag-only release push refs
-              run: git config remote.origin.push 'refs/tags/*:refs/tags/*'
-            - name: Configure Git author
-              run: |
-                  git config user.name 'github-actions[bot]'
-                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            - name: Verify the exact release commit
+              working-directory: target/release-source
+              run: npx just test
             - name: Publish release
               id: publish-release
+              working-directory: target/release-source
               continue-on-error: true
+              env:
+                  GH_TOKEN: ${{ github.token }}
               run: |
                   set -o pipefail
                   mkdir -p target/release
@@ -175,6 +129,9 @@ jobs:
             # Rekor accepts it.
             - name: Re-publish release after a transient sigstore failure
               if: steps.publish-release.outcome == 'failure'
+              working-directory: target/release-source
+              env:
+                  GH_TOKEN: ${{ github.token }}
               run: |
                   if grep -Eiq 'OIDC token exchange failed with status 404' target/release/publish.log; then
                     echo 'npm Trusted Publishing is not configured correctly for this workflow.'
