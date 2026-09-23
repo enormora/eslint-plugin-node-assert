@@ -87,11 +87,11 @@ export async function buildConfig() {
             },
             additionalFiles: [
                 {
-                    sourceFilePath: path.join(projectFolder, 'LICENSE'),
+                    inputFilePath: path.join(projectFolder, 'LICENSE'),
                     targetFilePath: 'LICENSE'
                 },
                 {
-                    sourceFilePath: path.join(projectFolder, 'README.md'),
+                    inputFilePath: path.join(projectFolder, 'README.md'),
                     targetFilePath: 'README.md'
                 }
             ]
