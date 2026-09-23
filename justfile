@@ -31,7 +31,13 @@ changelog: update-eslint-docs
 	packtory changelog
 
 prepare-release: update-eslint-docs
-	packtory release --write-changelog --commit --no-dry-run
+	packtory release-pr maintain --no-dry-run
+
+validate-release-pr:
+	packtory release-pr validate
+
+authorize-release-publish *OPTIONS:
+	packtory release-pr authorize-publish {{OPTIONS}}
 
 publish-release: update-eslint-docs
 	packtory release --publish --tag --push --github-release --no-dry-run

@@ -31,3 +31,9 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 | [require-valid-error-validator-return](docs/rules/require-valid-error-validator-return.md) | Require custom Node.js assert error validators to return true when their checks pass                                    |    |
 
 <!-- end auto-generated rules list -->
+
+## Releasing
+
+Run the **Release** workflow → Packtory creates or updates `release/eslint-plugin-node-assert` → review and merge the release PR → **Publish Release** authorizes the merge and publishes to npm through Trusted Publishing/OIDC.
+
+Normal merges to `main` do not publish a package.

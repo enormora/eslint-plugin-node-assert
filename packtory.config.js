@@ -70,7 +70,27 @@ export async function buildConfig() {
         ...registrySettings === undefined ? {} : { registrySettings },
         changelog: {
             packageTagFormat: '{packageName}@{version}',
+            prLog: {
+                ignoredLabels: [ 'release' ]
+            },
             outputs: [ { kind: 'repository-file', path: 'CHANGELOG.md' }, { kind: 'github-release' } ]
+        },
+        releasePullRequest: {
+            branch: 'release/eslint-plugin-node-assert',
+            body: 'Updates CHANGELOG.md for the next @enormora/eslint-plugin-node-assert release.',
+            githubActionsCi: {
+                trigger: 'workflow-dispatch',
+                workflowFile: 'main.yml',
+                requiredStatusContexts: [
+                    'Test (22.x)',
+                    'Test (24.x)',
+                    'Test (26.x)',
+                    'Release PR policy',
+                    'Workflow Security Analysis'
+                ]
+            },
+            label: 'release',
+            title: 'Prepare release'
         },
         commonPackageSettings: {
             sourcesFolder,
@@ -87,11 +107,11 @@ export async function buildConfig() {
             },
             additionalFiles: [
                 {
-                    sourceFilePath: path.join(projectFolder, 'LICENSE'),
+                    inputFilePath: path.join(projectFolder, 'LICENSE'),
                     targetFilePath: 'LICENSE'
                 },
                 {
-                    sourceFilePath: path.join(projectFolder, 'README.md'),
+                    inputFilePath: path.join(projectFolder, 'README.md'),
                     targetFilePath: 'README.md'
                 }
             ]

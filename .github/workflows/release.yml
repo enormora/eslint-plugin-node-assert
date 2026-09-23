@@ -8,27 +8,24 @@ permissions: {}
 
 concurrency:
     group: release-pr
+    cancel-in-progress: false
 
 jobs:
     prepare-release:
         runs-on: ubuntu-24.04
         name: Prepare release pull request
         permissions:
-            contents: write # Required to push the generated changelog commit to the release branch.
-            pull-requests: write # Required to create, update, and close release pull requests.
-            issues: write # Required to apply the build label to the release pull request.
-        env:
-            GH_TOKEN: ${{ github.token }}
-            GITHUB_TOKEN: ${{ github.token }}
-            RELEASE_BRANCH: release/eslint-plugin-node-assert
-            RELEASE_PR_BODY: Updates CHANGELOG.md for the next @enormora/eslint-plugin-node-assert release.
-            RELEASE_PR_TITLE: Prepare release
+            actions: write # required to dispatch release PR CI and delete gated PR runs
+            contents: write # required to create or update the release branch
+            issues: write # required to apply the release label to the release PR
+            pull-requests: write # required to create, update, and close the release PR
+            statuses: write # required to mirror dispatched release PR CI results
         steps:
             - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
               with:
                   ref: main
                   fetch-depth: 0
-                  persist-credentials: true
+                  persist-credentials: false
             - name: Use Node.js
               uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
               with:
@@ -47,65 +44,8 @@ jobs:
                     exit 1
                   fi
                   echo "Verified ${spec} has a registered provenance attestation."
-            - name: Configure Git author
+            - name: Prepare release pull request
+              env:
+                  GH_TOKEN: ${{ github.token }}
               run: |
-                  git config user.name 'github-actions[bot]'
-                  git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            - name: Prepare release changelog commit
-              id: prepare-release
-              run: |
-                  starting_commit=$(git rev-parse HEAD)
                   npx just prepare-release
-
-                  if [ "$(git rev-parse HEAD)" = "${starting_commit}" ]; then
-                    echo "created-release-commit=false" >> "${GITHUB_OUTPUT}"
-                    exit 0
-                  fi
-
-                  echo "created-release-commit=true" >> "${GITHUB_OUTPUT}"
-            - name: Close stale release pull request and delete release branch
-              if: steps.prepare-release.outputs.created-release-commit == 'false'
-              run: |
-                  release_pr_number=$(
-                    gh pr list \
-                      --head "${RELEASE_BRANCH}" \
-                      --base main \
-                      --state open \
-                      --json number \
-                      --jq '.[0].number // empty'
-                  )
-
-                  if [ -n "${release_pr_number}" ]; then
-                    gh pr close "${release_pr_number}" --comment 'No release changelog changes were generated.'
-                  fi
-
-                  git push origin --delete "${RELEASE_BRANCH}" || true
-            - name: Push release branch
-              if: steps.prepare-release.outputs.created-release-commit == 'true'
-              run: git push origin "HEAD:refs/heads/${RELEASE_BRANCH}" --force-with-lease
-            - name: Create or update release pull request
-              if: steps.prepare-release.outputs.created-release-commit == 'true'
-              run: |
-                  release_pr_number=$(
-                    gh pr list \
-                      --head "${RELEASE_BRANCH}" \
-                      --base main \
-                      --state open \
-                      --json number \
-                      --jq '.[0].number // empty'
-                  )
-
-                  if [ -n "${release_pr_number}" ]; then
-                    gh pr edit "${release_pr_number}" \
-                      --title "${RELEASE_PR_TITLE}" \
-                      --body "${RELEASE_PR_BODY}" \
-                      --add-label build
-                    exit 0
-                  fi
-
-                  gh pr create \
-                    --head "${RELEASE_BRANCH}" \
-                    --base main \
-                    --title "${RELEASE_PR_TITLE}" \
-                    --body "${RELEASE_PR_BODY}" \
-                    --label build

@@ -7,6 +7,7 @@ on:
     pull_request:
         types: [opened, reopened, synchronize]
     merge_group:
+    workflow_dispatch:
 
 permissions: {}
 
@@ -68,3 +69,29 @@ jobs:
                   count="$(jq '[.runs[].results[]] | length' "$SARIF_FILE")"
                   echo "zizmor findings: $count"
                   test "$count" -eq 0
+
+    release-pr-policy:
+        name: Release PR policy
+        runs-on: ubuntu-latest
+        if: >
+            github.event_name == 'pull_request' ||
+            github.event_name == 'merge_group' ||
+            (github.event_name == 'workflow_dispatch' && github.ref_name == 'release/eslint-plugin-node-assert')
+        permissions:
+            contents: read # required for actions/checkout to read the repository source
+            pull-requests: read # required to read release PR files and metadata
+        steps:
+            - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+              with:
+                  persist-credentials: false
+            - name: Use Node.js
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version: 26.x
+            - name: Install dependencies
+              run: npm clean-install --ignore-scripts
+            - name: Validate release pull request
+              if: github.event_name == 'pull_request' || github.event_name == 'merge_group'
+              env:
+                  GH_TOKEN: ${{ github.token }}
+              run: npx just validate-release-pr
