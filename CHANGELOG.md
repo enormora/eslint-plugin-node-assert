@@ -1,3 +1,9 @@
+## @enormora/eslint-plugin-node-assert 0.0.3 (September 25, 2026)
+
+### Dependency Upgrades
+
+* Update @typescript-eslint/utils to 8.70.1
+
 ## @enormora/eslint-plugin-node-assert 0.0.2 (September 23, 2026)
 
 ### Documentation
