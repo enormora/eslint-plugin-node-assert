@@ -61,10 +61,7 @@ export const noExpectedValueAsMessageRule = createRule({
 
         function checkOkStyleCall(node: Readonly<TSESTree.CallExpression>): void {
             const secondArgument = getSecondArgument(node.arguments);
-            if (secondArgument === undefined) {
-                return;
-            }
-            if (!isConstant(secondArgument) || isConstantString(secondArgument)) {
+            if (secondArgument === undefined || !isConstant(secondArgument) || isConstantString(secondArgument)) {
                 return;
             }
             context.report({ messageId: 'expected-value-as-message', node: secondArgument });
@@ -72,10 +69,7 @@ export const noExpectedValueAsMessageRule = createRule({
 
         function checkErrorMatcherCall(node: Readonly<TSESTree.CallExpression>): void {
             const secondArgument = getSecondArgument(node.arguments);
-            if (secondArgument === undefined) {
-                return;
-            }
-            if (!isConstantString(secondArgument)) {
+            if (secondArgument === undefined || !isConstantString(secondArgument)) {
                 return;
             }
             context.report({ messageId: 'string-as-error-matcher', node: secondArgument });

@@ -111,10 +111,10 @@ const ruleSchema: JSONSchema4[] = [
 
 function checkAssertionCall(runtime: RuleRuntime, node: Readonly<TSESTree.CallExpression>): void {
     const resolvedMatcherCheck = getResolvedMatcherCheck(runtime, node);
-    if (skipResolvedMatcherCheck(runtime, node, resolvedMatcherCheck)) {
-        return;
-    }
-    if (reportDisallowedMatcherCheck(runtime, resolvedMatcherCheck)) {
+    if (
+        skipResolvedMatcherCheck(runtime, node, resolvedMatcherCheck) ||
+        reportDisallowedMatcherCheck(runtime, resolvedMatcherCheck)
+    ) {
         return;
     }
     const matcherObjectExpression = getMatcherObjectExpression(resolvedMatcherCheck.matcherClassification);

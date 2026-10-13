@@ -177,16 +177,11 @@ function hasUnsafeFixingConditions(
     replacementPlan: Readonly<ReplacementPlan>,
     sourceCode: Readonly<TSESLint.SourceCode>
 ): boolean {
-    if (sourceCode.getCommentsInside(assertionNode).length > 0) {
-        return true;
-    }
-    if (!isDefinitelySideEffectFreeExpression(replacementPlan.regularExpressionExpression)) {
-        return true;
-    }
-    if (!isDefinitelySideEffectFreeExpression(replacementPlan.actualValueExpression)) {
-        return true;
-    }
-    return false;
+    return (
+        sourceCode.getCommentsInside(assertionNode).length > 0 ||
+        !isDefinitelySideEffectFreeExpression(replacementPlan.regularExpressionExpression) ||
+        !isDefinitelySideEffectFreeExpression(replacementPlan.actualValueExpression)
+    );
 }
 
 function getComputedReplacementPropertyText(

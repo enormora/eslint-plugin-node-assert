@@ -82,10 +82,7 @@ export const requireCustomMessageRule = createRule({
                     return;
                 }
                 const slotIndex = MESSAGE_SLOT_BY_METHOD.get(resolved.methodName);
-                if (slotIndex === undefined) {
-                    return;
-                }
-                if (classifyMessageSlot(node.arguments, slotIndex) !== 'missing') {
+                if (slotIndex === undefined || classifyMessageSlot(node.arguments, slotIndex) !== 'missing') {
                     return;
                 }
                 context.report({
