@@ -412,10 +412,11 @@ export const requireValidErrorValidatorReturnRule = createRule({
                     return;
                 }
                 const validatorArgument = getSecondArgument(node.arguments);
-                if (validatorArgument === undefined || !isValidatorFunction(validatorArgument)) {
-                    return;
-                }
-                if (!isInvalidValidatorAnalysis(analyzeValidatorFunction(validatorArgument, resolveAssertCall))) {
+                if (
+                    validatorArgument === undefined ||
+                    !isValidatorFunction(validatorArgument) ||
+                    !isInvalidValidatorAnalysis(analyzeValidatorFunction(validatorArgument, resolveAssertCall))
+                ) {
                     return;
                 }
                 context.report({

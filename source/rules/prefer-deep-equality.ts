@@ -127,10 +127,7 @@ export const preferDeepEqualityRule = createRule({
                 return;
             }
             const deepMethodName = SHALLOW_TO_DEEP_METHOD_NAME.get(resolved.methodName);
-            if (deepMethodName === undefined) {
-                return;
-            }
-            if (!comparesObjectOrArrayLiteral(node)) {
+            if (deepMethodName === undefined || !comparesObjectOrArrayLiteral(node)) {
                 return;
             }
             reportShallowEquality(node, resolved.methodName, deepMethodName);
