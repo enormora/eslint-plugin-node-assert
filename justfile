@@ -16,7 +16,7 @@ test-unit:
 update-eslint-docs: compile
 	eslint-doc-generator
 
-test: lint test-unit packtory-dry-run
+test: lint test-unit check-packages
 
 packtory-dry-run: update-eslint-docs
 	packtory publish
@@ -41,3 +41,7 @@ authorize-release-publish *OPTIONS:
 
 publish-release: update-eslint-docs
 	packtory release --publish --tag --push --github-release --no-dry-run
+
+check-packages: compile
+    rm -rf target/package-checks
+    packtory pack --all --format folder --out target/package-checks
