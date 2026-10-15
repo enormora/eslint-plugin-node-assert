@@ -38,9 +38,9 @@ jobs:
               run: npx just test-unit
             - name: Lint source code
               run: npx just lint
-            - name: Check packages
+            - name: Publish dry run
               if: matrix.node-version == '26.x'
-              run: npx just check-packages
+              run: npx just packtory-dry-run
 
     workflow-security:
         name: Workflow Security Analysis
