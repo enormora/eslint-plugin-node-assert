@@ -38,7 +38,7 @@ jobs:
               run: npx just test-unit
             - name: Lint source code
               run: npx just lint
-            - name: Run Packtory dry-run
+            - name: Publish dry run
               if: matrix.node-version == '26.x'
               run: npx just packtory-dry-run
 

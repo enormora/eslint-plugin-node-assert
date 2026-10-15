@@ -140,7 +140,7 @@ jobs:
                     exit 1
                   fi
 
-                  if grep -Eiq 'attestation|oidc|provenance|rekor|sigstore|tlog' target/release/publish.log; then
+                  if grep -Eiq 'equivalent entry already exists|ECONNRESET|ETIMEDOUT|EAI_AGAIN|status (429|500|502|503|504)' target/release/publish.log; then
                     sleep 30
                     npx just publish-release
                     exit 0
