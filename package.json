@@ -26,11 +26,11 @@
         "@typescript-eslint/utils": "8.71.2"
     },
     "devDependencies": {
-        "@enormora/eslint-config-base": "0.0.70",
-        "@enormora/eslint-config-eslint-plugin": "0.0.15",
-        "@enormora/eslint-config-mocha-node-assert": "0.0.25",
-        "@enormora/eslint-config-node": "0.0.49",
-        "@enormora/eslint-config-typescript": "0.0.78",
+        "@enormora/eslint-config-base": "0.0.71",
+        "@enormora/eslint-config-eslint-plugin": "0.0.16",
+        "@enormora/eslint-config-mocha-node-assert": "0.0.26",
+        "@enormora/eslint-config-node": "0.0.50",
+        "@enormora/eslint-config-typescript": "0.0.79",
         "@packtory/cli": "0.0.124",
         "@types/mocha": "10.0.10",
         "@types/node": "24.19.2",
