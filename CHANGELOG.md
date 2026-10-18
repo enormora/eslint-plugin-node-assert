@@ -1,3 +1,18 @@
+## @enormora/eslint-plugin-node-assert 0.0.4 (October 18, 2026)
+
+### Enhancements
+
+* Add Node.js 24 support ([#763](https://github.com/enormora/eslint-plugin-node-assert/pull/763))
+
+### Dependency Upgrades
+
+* ⬆️ Update Linting-related dependencies ([#755](https://github.com/enormora/eslint-plugin-node-assert/pull/755))
+* Update @typescript-eslint/utils to 8.71.2
+
+### Build-Related
+
+* Maintain release PRs automatically after main CI ([#768](https://github.com/enormora/eslint-plugin-node-assert/pull/768))
+
 ## @enormora/eslint-plugin-node-assert 0.0.3 (September 25, 2026)
 
 ### Dependency Upgrades
