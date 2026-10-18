@@ -34,6 +34,6 @@ ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/asse
 
 ## Releasing
 
-Run the **Release** workflow → Packtory creates or updates `release/eslint-plugin-node-assert` → review and merge the release PR → **Publish Release** authorizes the merge and publishes to npm through Trusted Publishing/OIDC.
+CI on `main` authorizes publishing for merged release PRs, then creates or updates `release/eslint-plugin-node-assert`. Review and merge that release PR to publish to npm through Trusted Publishing/OIDC.
 
-Normal merges to `main` do not publish a package.
+Run **Publish Release** on `main` without inputs to refresh the release PR manually. To retry publishing a merged release PR, provide its number as `release_pull_request_number`.

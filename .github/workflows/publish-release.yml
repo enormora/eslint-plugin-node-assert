@@ -7,8 +7,8 @@ on:
     workflow_dispatch:
         inputs:
             release_pull_request_number:
-                description: Merged release pull request number to retry publishing
-                required: true
+                description: Merged release PR number to retry publishing; leave empty to refresh the release PR
+                required: false
                 type: string
 
 permissions: {}
@@ -18,7 +18,17 @@ concurrency:
     cancel-in-progress: false
 
 jobs:
+    continuous-integration:
+        name: Continuous integration
+        uses: ./.github/workflows/main.yml
+        permissions:
+            contents: read # required to check out the workflow source
+            pull-requests: read # required to read release PR files and metadata
+            security-events: write # required to upload workflow security analysis
+
     authorize-release-publish:
+        needs: continuous-integration
+        if: github.event_name == 'push' || inputs.release_pull_request_number != ''
         runs-on: ubuntu-24.04
         name: Authorize release publish
         permissions:
@@ -147,3 +157,23 @@ jobs:
                   fi
 
                   exit 1
+
+    maintain-release-pr:
+        needs: [continuous-integration, authorize-release-publish, publish-release]
+        name: Maintain release PR
+        if: >
+            always() &&
+            github.ref_name == 'main' &&
+            (github.event_name == 'push' || inputs.release_pull_request_number == '') &&
+            needs.continuous-integration.result == 'success' &&
+            needs.authorize-release-publish.result != 'failure' &&
+            needs.authorize-release-publish.result != 'cancelled' &&
+            needs.publish-release.result != 'failure' &&
+            needs.publish-release.result != 'cancelled'
+        uses: ./.github/workflows/release.yml
+        permissions:
+            actions: write # required to dispatch release PR CI and delete gated PR runs
+            contents: write # required to create or update the release branch
+            issues: write # required to apply the release label to the release PR
+            pull-requests: write # required to create, update, and close the release PR
+            statuses: write # required to mirror dispatched release PR CI results
