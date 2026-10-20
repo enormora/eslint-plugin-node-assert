@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
     prepare-release:
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-26.04
         name: Prepare release pull request
         permissions:
             actions: write # required to dispatch release PR CI and delete gated PR runs

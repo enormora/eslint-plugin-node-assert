@@ -29,7 +29,7 @@ jobs:
     authorize-release-publish:
         needs: continuous-integration
         if: github.event_name == 'push' || inputs.release_pull_request_number != ''
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-26.04
         name: Authorize release publish
         permissions:
             contents: read # required to check out the workflow source
@@ -85,7 +85,7 @@ jobs:
     publish-release:
         needs: authorize-release-publish
         if: needs.authorize-release-publish.outputs.should_publish == 'true'
-        runs-on: ubuntu-24.04
+        runs-on: ubuntu-26.04
         name: Publish release
         permissions:
             contents: write # required to create package tags and GitHub Releases
