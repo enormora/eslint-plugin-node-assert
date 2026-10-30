@@ -36,10 +36,9 @@ function getMemberRoot(expression: Readonly<TSESTree.Expression>): Readonly<TSES
 }
 
 function getEligibleCallExpression(node: Readonly<TSESTree.Node>): Readonly<TSESTree.CallExpression> | undefined {
-    if (node.type !== AST_NODE_TYPES.ExpressionStatement) {
-        return undefined;
-    }
-    if (node.expression.type !== AST_NODE_TYPES.CallExpression) {
+    if (
+        node.type !== AST_NODE_TYPES.ExpressionStatement || node.expression.type !== AST_NODE_TYPES.CallExpression
+    ) {
         return undefined;
     }
     return node.expression;
@@ -58,10 +57,7 @@ function getActualMemberExpression(
         return undefined;
     }
     const [ actual, expected ] = call.arguments;
-    if (actual === undefined || expected === undefined) {
-        return undefined;
-    }
-    if (expected.type === AST_NODE_TYPES.SpreadElement) {
+    if (actual === undefined || expected === undefined || expected.type === AST_NODE_TYPES.SpreadElement) {
         return undefined;
     }
     return isPlainMemberExpression(actual) ? actual : undefined;

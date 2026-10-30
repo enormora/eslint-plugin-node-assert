@@ -52,7 +52,8 @@ function getTwoExpressionArguments(
     if (firstArgument === undefined || secondArgument === undefined) {
         return undefined;
     }
-    if (firstArgument.type === AST_NODE_TYPES.SpreadElement || secondArgument.type === AST_NODE_TYPES.SpreadElement) {
+    const firstArgumentIsSpread = firstArgument.type === AST_NODE_TYPES.SpreadElement;
+    if (firstArgumentIsSpread || secondArgument.type === AST_NODE_TYPES.SpreadElement) {
         return undefined;
     }
     return { firstArgument, secondArgument };
@@ -73,7 +74,8 @@ function getRegularExpressionTestMemberExpression(
     if (callee.type !== AST_NODE_TYPES.MemberExpression || callee.optional) {
         return undefined;
     }
-    if (ASTUtils.getPropertyName(callee, scope) !== 'test' || callee.object.type === AST_NODE_TYPES.Super) {
+    const propertyName = ASTUtils.getPropertyName(callee, scope);
+    if (propertyName !== 'test' || callee.object.type === AST_NODE_TYPES.Super) {
         return undefined;
     }
     return callee;

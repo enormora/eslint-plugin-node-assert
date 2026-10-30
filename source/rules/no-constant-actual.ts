@@ -35,10 +35,10 @@ type EqualityArguments = {
 
 function getEqualityArguments(args: readonly TSESTree.CallExpressionArgument[]): EqualityArguments | undefined {
     const [ actualArg, expectedArg ] = args;
-    if (actualArg === undefined || expectedArg === undefined) {
-        return undefined;
-    }
-    if (actualArg.type === AST_NODE_TYPES.SpreadElement || expectedArg.type === AST_NODE_TYPES.SpreadElement) {
+    if (
+        actualArg === undefined || expectedArg === undefined || actualArg.type === AST_NODE_TYPES.SpreadElement ||
+        expectedArg.type === AST_NODE_TYPES.SpreadElement
+    ) {
         return undefined;
     }
     return { actualArg, expectedArg };

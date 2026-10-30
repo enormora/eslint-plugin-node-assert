@@ -42,10 +42,11 @@ function getDestructuredAssignment(
     if (property.type !== AST_NODE_TYPES.Property || property.computed) {
         return undefined;
     }
-    if (property.key.type !== AST_NODE_TYPES.Identifier || property.value.type !== AST_NODE_TYPES.Identifier) {
+    const { key, value } = property;
+    if (key.type !== AST_NODE_TYPES.Identifier || value.type !== AST_NODE_TYPES.Identifier) {
         return undefined;
     }
-    return { localName: property.value.name, propertyName: property.key.name };
+    return { localName: value.name, propertyName: key.name };
 }
 
 function applyKnownProperty<TMeta>(
