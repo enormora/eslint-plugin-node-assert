@@ -6,6 +6,8 @@
 
 ESLint rules for [Node.js assert module](https://nodejs.org/docs/latest/api/assert.html).
 
+Requires Node.js 26.x.
+
 ## Rules
 
 <!-- begin auto-generated rules list -->
