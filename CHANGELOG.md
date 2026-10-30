@@ -1,3 +1,13 @@
+## @enormora/eslint-plugin-node-assert 0.0.7 (October 30, 2026)
+
+### Breaking Changes
+
+* Support only Node.js 26 ([#785](https://github.com/enormora/eslint-plugin-node-assert/pull/785))
+
+### Dependency Upgrades
+
+* ⬆️ Update Linting-related dependencies ([#777](https://github.com/enormora/eslint-plugin-node-assert/pull/777))
+
 ## @enormora/eslint-plugin-node-assert 0.0.6 (October 30, 2026)
 
 ### Breaking Changes
