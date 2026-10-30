@@ -108,7 +108,6 @@ export async function buildConfiguration() {
                 trigger: 'workflow-dispatch',
                 workflowFile: 'main.yml',
                 requiredStatusContexts: [
-                    'Test (24.x)',
                     'Test (26.x)',
                     'Release PR policy',
                     'Workflow Security Analysis'
