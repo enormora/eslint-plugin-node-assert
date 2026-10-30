@@ -206,10 +206,10 @@ function getDefinitionResolutionSteps(
     scope: TSESLint.Scope.Scope,
     visitedVariableNames: ReadonlySet<string>
 ): readonly MatcherResolutionStep[] {
-    if (expression.type !== AST_NODE_TYPES.Identifier || visitedVariableNames.has(expression.name)) {
-        return [];
-    }
-    if (builtInErrorConstructorNames.has(expression.name)) {
+    if (
+        expression.type !== AST_NODE_TYPES.Identifier || visitedVariableNames.has(expression.name) ||
+        builtInErrorConstructorNames.has(expression.name)
+    ) {
         return [];
     }
     const variable = ASTUtils.findVariable(scope, expression.name) ?? undefined;
