@@ -17,16 +17,22 @@ jobs:
         runs-on: ubuntu-latest
         permissions:
             pull-requests: read # required to inspect labels on the pull request event payload
-        if: github.event_name == 'pull_request'
         steps:
-            - if: >
-                  contains(github.event.pull_request.labels.*.name, 'breaking') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'bug') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'feature') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'enhancement') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'documentation') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'upgrade') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'refactor') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'build') == false &&
-                  contains(github.event.pull_request.labels.*.name, 'release') == false
-              run: echo "None of the required pull request labels are set" && exit 1
+            - name: Validate labels
+              env:
+                  HAS_VALID_LABEL: >-
+                      ${{ github.event_name != 'pull_request' ||
+                      contains(github.event.pull_request.labels.*.name, 'release') ||
+                      contains(github.event.pull_request.labels.*.name, 'breaking') ||
+                      contains(github.event.pull_request.labels.*.name, 'bug') ||
+                      contains(github.event.pull_request.labels.*.name, 'feature') ||
+                      contains(github.event.pull_request.labels.*.name, 'enhancement') ||
+                      contains(github.event.pull_request.labels.*.name, 'documentation') ||
+                      contains(github.event.pull_request.labels.*.name, 'upgrade') ||
+                      contains(github.event.pull_request.labels.*.name, 'refactor') ||
+                      contains(github.event.pull_request.labels.*.name, 'build') }}
+              run: |
+                  if [ "$HAS_VALID_LABEL" != true ]; then
+                      echo "None of the required pull request labels are set"
+                      exit 1
+                  fi
