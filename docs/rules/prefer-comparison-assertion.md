@@ -15,8 +15,8 @@ Examples of **incorrect** code for this rule:
 ```js
 import assert from 'node:assert/strict';
 
-assert.ok(actual === expected);
-assert(actual !== expected);
+assert.ok(actual === 42);
+assert(actual !== 'expected');
 assert.equal(result.deep.value === 42, true);
 ```
 
@@ -25,8 +25,8 @@ Examples of **correct** code for this rule:
 ```js
 import assert from 'node:assert/strict';
 
-assert.strictEqual(actual, expected);
-assert.notStrictEqual(actual, expected);
+assert.strictEqual(actual, 42);
+assert.notStrictEqual(actual, 'expected');
 assert.strictEqual(result.deep.value, 42);
 ```
 
@@ -48,7 +48,14 @@ The rule intentionally skips loose comparisons on `node:assert/strict` (and `{ s
 
 ## Fixes
 
-Autofix is conservative in two cases:
+Autofix is withheld unless a literal operand rules out differences between the comparison operator and the replacement assertion:
+
+- Strict comparisons can differ for NaN and signed zero. A strict comparison is autofixed only when an operand is a non-zero numeric literal or a known non-number literal.
+- Legacy loose comparisons treat two NaN values as equal even though == and != do not. A loose comparison is autofixed only when an operand is a literal or no-substitution template that cannot be NaN.
+
+The rule still reports comparisons without an autofix so the assertion can be rewritten manually when its semantics are understood.
+
+Autofix is also withheld in two structural cases:
 
 - Named method bindings such as `import { ok } from "node:assert/strict"; ok(a === b);` are reported but not rewritten automatically, because the corresponding comparison method may not be in scope.
 - Calls containing comments are reported without a fix to avoid dropping or moving comments while restructuring the argument list.

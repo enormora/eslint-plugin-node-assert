@@ -25,6 +25,7 @@ type SupportedComparisonExpression = Readonly<TSESTree.BinaryExpression> & {
 };
 type ComparisonPlan = {
     readonly consumedArgumentCount: typeof oneAssertionArgument | typeof twoAssertionArguments;
+    readonly comparisonOperator: SupportedBinaryOperator;
     readonly leftExpression: TSESTree.Expression;
     readonly replacementMethodName: ReplacementMethodName;
     readonly rightExpression: TSESTree.Expression;
@@ -118,6 +119,65 @@ function usesLooseEqualityOperator(operator: SupportedBinaryOperator): boolean {
     return operator === '!=' || operator === '==';
 }
 
+function getNumericLiteralValue(expression: Readonly<TSESTree.Expression>): number | undefined {
+    if (expression.type !== AST_NODE_TYPES.Literal) {
+        return undefined;
+    }
+    return typeof expression.value === 'number' ? expression.value : undefined;
+}
+
+function isNumericSignOperator(operator: string): operator is '+' | '-' {
+    return operator === '+' || operator === '-';
+}
+
+function getStaticNumericLiteralValue(expression: Readonly<TSESTree.Expression>): number | undefined {
+    const numericLiteralValue = getNumericLiteralValue(expression);
+    if (numericLiteralValue !== undefined) {
+        return numericLiteralValue;
+    }
+    if (expression.type !== AST_NODE_TYPES.UnaryExpression || !isNumericSignOperator(expression.operator)) {
+        return undefined;
+    }
+    const argumentValue = getNumericLiteralValue(expression.argument);
+    if (argumentValue === undefined) {
+        return undefined;
+    }
+    return expression.operator === '-' ? -argumentValue : argumentValue;
+}
+
+function isKnownNonNaNConstant(expression: Readonly<TSESTree.Expression>): boolean {
+    if (expression.type === AST_NODE_TYPES.Literal) {
+        return typeof expression.value !== 'number' || !Number.isNaN(expression.value);
+    }
+    if (expression.type === AST_NODE_TYPES.TemplateLiteral && expression.expressions.length === 0) {
+        return true;
+    }
+    const staticNumericLiteralValue = getStaticNumericLiteralValue(expression);
+    return staticNumericLiteralValue !== undefined && !Number.isNaN(staticNumericLiteralValue);
+}
+
+function isKnownStrictEqualitySafeConstant(expression: Readonly<TSESTree.Expression>): boolean {
+    const staticNumericLiteralValue = getStaticNumericLiteralValue(expression);
+    if (staticNumericLiteralValue !== undefined) {
+        return staticNumericLiteralValue !== 0 && !Number.isNaN(staticNumericLiteralValue);
+    }
+    if (expression.type === AST_NODE_TYPES.Literal) {
+        return typeof expression.value !== 'number';
+    }
+    return expression.type === AST_NODE_TYPES.TemplateLiteral && expression.expressions.length === 0;
+}
+
+function hasSemanticsPreservingLiteralOperand(
+    operator: SupportedBinaryOperator,
+    leftExpression: Readonly<TSESTree.Expression>,
+    rightExpression: Readonly<TSESTree.Expression>
+): boolean {
+    if (usesLooseEqualityOperator(operator)) {
+        return isKnownNonNaNConstant(leftExpression) || isKnownNonNaNConstant(rightExpression);
+    }
+    return isKnownStrictEqualitySafeConstant(leftExpression) || isKnownStrictEqualitySafeConstant(rightExpression);
+}
+
 function getReplacementMethodName(
     operator: SupportedBinaryOperator,
     isStrictModule: boolean,
@@ -151,6 +211,7 @@ function buildComparisonPlan(
     }
     return {
         consumedArgumentCount,
+        comparisonOperator: comparisonExpression.operator,
         leftExpression: comparisonExpression.left,
         replacementMethodName,
         rightExpression: comparisonExpression.right
@@ -272,7 +333,14 @@ function buildFix(
     resolved: Readonly<ResolvedMethodCall<boolean>>,
     sourceCode: Readonly<TSESLint.SourceCode>
 ): TSESLint.ReportFixFunction | null {
-    if (hasUnsafeFixingConditions(assertionNode, sourceCode)) {
+    if (
+        !hasSemanticsPreservingLiteralOperand(
+            comparisonPlan.comparisonOperator,
+            comparisonPlan.leftExpression,
+            comparisonPlan.rightExpression
+        ) ||
+        hasUnsafeFixingConditions(assertionNode, sourceCode)
+    ) {
         return null;
     }
     const replacementCalleeText = buildReplacementCalleeText(
@@ -314,7 +382,7 @@ export const preferComparisonAssertionRule = createRule({
         schema: [],
         messages: {
             'prefer-comparison-assertion':
-                "Use '{{replacementMethodName}}' instead of asserting the result of a comparison expression"
+                "Use '{{replacementMethodName}}' when it preserves this comparison's semantics"
         }
     },
     defaultOptions: [],
