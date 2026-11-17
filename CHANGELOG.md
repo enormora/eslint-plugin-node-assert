@@ -13,6 +13,21 @@
 * Update `@enormora/tsconfig-node` to `0.0.3` ([#802](https://github.com/enormora/eslint-plugin-node-assert/pull/802))
 * Adopt `@enormora/tsconfig-node` ([#801](https://github.com/enormora/eslint-plugin-node-assert/pull/801))
 
+## @enormora/eslint-plugin-node-assert 0.0.8 (November 17, 2026)
+
+### Bug Fixes
+
+* Preserve comparison assertion semantics during autofix ([#804](https://github.com/enormora/eslint-plugin-node-assert/pull/804))
+
+### Dependency Upgrades
+
+* Update @typescript-eslint/utils to 8.73.0
+
+### Build-Related
+
+* Update `@enormora/tsconfig-node` to `0.0.3` ([#802](https://github.com/enormora/eslint-plugin-node-assert/pull/802))
+* Adopt `@enormora/tsconfig-node` ([#801](https://github.com/enormora/eslint-plugin-node-assert/pull/801))
+
 ## @enormora/eslint-plugin-node-assert 0.0.7 (November 12, 2026)
 
 ### Dependency Upgrades
